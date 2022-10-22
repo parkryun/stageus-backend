@@ -4,8 +4,9 @@ const port = 3000
 
 app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다 여기), response(백엔드에서 보내줄거) 다 오브젝트 형태로옴, 주소3000/mainpage이런거임
     res.sendFile(__dirname + "/mainPage.html")   // js는 무조건 절대경로로 가져오는데 __dirname은 뒤에 파일 이름을 찾아서 가져옴 이게 api야 가져오는거 보내주는거
-    //sendFile이게 뭔뜻이었지
+    //sendFile이게 뭔뜻이었지 // 아 .3000/mainPage를 들어가면 /mainPage.html을 보내준다고
 })
+
 
 app.post("/login", (req, res) => {
 
