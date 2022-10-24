@@ -35,7 +35,7 @@
         <section id="post_comment_container">
             <div id="comment_input_container">
                 <input type="text" id="comment_input" value="댓글을 작성해주세요.">
-                <input type="button" id="comment_input_btn" value="댓글 작성">
+                <input type="button" id="comment_input_btn" value="댓글 작성" onclick="location.href='/post/writeComment'">
             </div>
             <div id="comment_list_container">
                 <table>
@@ -43,16 +43,16 @@
                         <td>네 안녕하세요</td>
                         <td>박륜</td>
                         <td>
-                            <input type="button" id="comment_update_btn" value="댓글 수정">
-                            <input type="button" id="comment_remove_btn" value="댓글 삭제">
+                            <input type="button" id="comment_update_btn" value="댓글 수정" onclick="location.href='/post/updateComment'">
+                            <input type="button" id="comment_remove_btn" value="댓글 삭제" onclick="location.href='/post/removeComment'">
                         </td>
                     </tr>
                     <tr>
                         <td>안녕 못합니다.</td>
                         <td>박류운</td>
                         <td>
-                            <input type="button" id="comment_update_btn" value="댓글 수정">
-                            <input type="button" id="comment_remove_btn" value="댓글 삭제">
+                            <input type="button" id="comment_update_btn" value="댓글 수정" onclick="location.href='/post/updateComment'">
+                            <input type="button" id="comment_remove_btn" value="댓글 삭제" onclick="location.href='/post/removeComment'">
                         </td>
                     </tr>
                 </table>
