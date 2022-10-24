@@ -8,17 +8,36 @@ app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다
 })
 
 // 이렇게 경로를 적고 하는거 자체가 라우터라는건가?
+
+
+// 로그인 api
 app.post("/login", (req, res) => {
-
+    res.sendFile(__dirname + "/login.html")
 })
 
-app.get("/account", (req, res) => {         //가져오는거 계정정보
-    
+// 게시판 가져오기 api
+app.get("/board", (req, res) => {         
+    res.sendFile(__dirname + "/board.html")
 })
 
+// 게시글 가져오기 api
+app.get("/post", (req, res) => {
+    res.sendFile(__dirname + "/post.html")
+})
 
-app.post("/account", (req, res) => {        //회원가입
-    
+// 회원가입 api
+app.post("/join", (req, res) => {
+    res.sendFile(__dirname + "/join.html")
+})
+
+// 아이디찾기
+app.post("/findID", (req, res) => {
+    res.sendFile(__dirname + "/findID.html")
+})
+
+// 비밀번호 찾기
+app.post("/findPW", (req, res) => {
+    res.sendFile(__dirname + "/findPW.html")
 })
 
 app.listen(port, () => {    // listen은 이 Js를 구동하면 실행하는 것 매개변수를 받고 실행
