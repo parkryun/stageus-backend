@@ -4,11 +4,12 @@ const session = require('express-session')
 const Memorystore = require('memorystore')(session)
 const app = express() //express 문법 사용한다고 // import한걸 가져오는거
 
-const loginRouter = require("./routes/login")
-const boardRouter = require("./routes/board")
-const postRouter = require("./routes/post")
-const joinRouter = require("./routes/join")
-const findRouter = require("./routes/find")
+const loginRouter = require("./router/login")
+const boardRouter = require("./router/board")
+const postRouter = require("./router/post")
+const joinRouter = require("./router/join")
+const findRouter = require("./router/find")
+const pagesApi = require("./router/pages.js")
 
 const port = 3000
 
@@ -32,6 +33,7 @@ app.use('/board', boardRouter)
 app.use('/post', postRouter)
 app.use('/join', joinRouter)
 app.use('/find', findRouter)
+app.use("/", pagesApi)
 
 app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다 여기), response(백엔드에서 보내줄거) 다 오브젝트 형태로옴, 주소3000/mainpage이런거임
     res.sendFile(path.join(__dirname, "../mainPage.html"))   // js는 무조건 절대경로로 가져오는데 __dirname은 뒤에 파일 이름을 찾아서 가져옴 이게 api야 가져오는거 보내주는거
