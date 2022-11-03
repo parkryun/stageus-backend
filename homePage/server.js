@@ -24,14 +24,14 @@ const sessionObj = {
     }
 }
 
+app.use(session(sessionObj))
+app.use(express.urlencoded({extended: true}))
+
 app.use('/login', loginRouter)
 app.use('/board', boardRouter)
 app.use('/post', postRouter)
 app.use('/join', joinRouter)
 app.use('/find', findRouter)
-
-app.use(session(sessionObj))
-app.use(express.urlencoded({extended: true}))
 
 app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다 여기), response(백엔드에서 보내줄거) 다 오브젝트 형태로옴, 주소3000/mainpage이런거임
     res.sendFile(path.join(__dirname, "../mainPage.html"))   // js는 무조건 절대경로로 가져오는데 __dirname은 뒤에 파일 이름을 찾아서 가져옴 이게 api야 가져오는거 보내주는거
@@ -39,8 +39,6 @@ app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다
 })
 
 // 이렇게 경로를 적고 하는거 자체가 라우터라는건가?
-
-
 
 
 

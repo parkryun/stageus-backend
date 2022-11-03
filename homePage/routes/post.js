@@ -3,6 +3,10 @@ const path = require("path")
 const router = express.Router()
 
 
+// 데이터 가져오는 api
+
+
+
 // 게시글 보는 페이지 (여기에 comment get까지 있어야겠는데 )
 router.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "../post.html"))
@@ -18,18 +22,20 @@ router.post("/write", (req, res) => {
     
 })
 
+// 게시글 수정 삭제 api
+
 // 댓글 작성수정삭제
-router.post("/writeComment", (req, res) => {
+router.post("/comment", (req, res) => {
     
 })
 
 // 댓글 수정
-router.put("/updateComment", (req, res) => {
+router.put("/comment", (req, res) => {
     
 })
 
 // 댓글 삭제
-router.delete("/removeComment", (req, res) => {
+router.delete("/comment", (req, res) => {
     
 })
 
