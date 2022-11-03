@@ -9,7 +9,9 @@ const boardRouter = require("./router/board")
 const postRouter = require("./router/post")
 const joinRouter = require("./router/join")
 const findRouter = require("./router/find")
-const pagesApi = require("./router/pages.js")
+const pagesApi = require("./router/pages")
+const accountApi = require("./router/account")
+
 
 const port = 3000
 
@@ -34,6 +36,7 @@ app.use('/post', postRouter)
 app.use('/join', joinRouter)
 app.use('/find', findRouter)
 app.use("/", pagesApi)
+app.use("/account", accountApi)
 
 app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다 여기), response(백엔드에서 보내줄거) 다 오브젝트 형태로옴, 주소3000/mainpage이런거임
     res.sendFile(path.join(__dirname, "../mainPage.html"))   // js는 무조건 절대경로로 가져오는데 __dirname은 뒤에 파일 이름을 찾아서 가져옴 이게 api야 가져오는거 보내주는거
@@ -47,6 +50,3 @@ app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다
 app.listen(port, () => {    // listen은 이 Js를 구동하면 실행하는 것 매개변수를 받고 실행
     console.log(`${port} 번에서 웹 서버가 시작됨`)
 })
-
-
-// 

@@ -15,10 +15,6 @@ router.post("/checkLogin", (req, res) => {
     req.session.isLogined = true;
 })
 
-// 로그아웃
-router.get("/logout", (req, res) => {
-    req.session.destroy()
-})
 
 
 // 회원정보 세션

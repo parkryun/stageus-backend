@@ -3,13 +3,18 @@ const path = require("path")
 const router = express.Router()
 
 
-
-
-router.post("/checkFindID", (req, res) => {
+// 아이디 찾기
+router.post("/id", (req, res) => {
     
 })
 
-router.post("/checkFindPW", (req, res) => {
+// 비밀번호 찾기
+router.post("/pw", (req, res) => {
+    
+})
+
+// 비밀번호 변경
+router.put("/pw", (req, res) => {
     
 })
 
