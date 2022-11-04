@@ -11,12 +11,12 @@
 
     <main id="login_container">
         <section id="login_input_container">
-            아이디 : <input type="text" id="id_input_content" class="login_input_content">
-            비밀번호 :<input type="password" id="pw_input_content" class="login_input_content">
+            아이디 : <input type="text" id="login_input_id" class="login_input_content">
+            비밀번호 :<input type="password" id="login_input_pw" class="login_input_content">
         </section>
 
         <section id="login_btn_container">
-            <input type="button" id="login_btn" value="로그인" onclick="location.href='checkLogin'">
+            <input type="button" id="login_btn" value="로그인" onclick="loginEvent()">
         </section>
     </main>
 
@@ -25,4 +25,30 @@
         <a href="/find/findPW">비밀번호 찾기</a>
     </section>
 </body>
+
+<script>
+    const loginEvent = async () => {
+    
+        const response = await fetch("/account/login", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id_value: document.getElementById("login_input_id").value,
+                pw_value: document.getElementById("login_input_pw").value
+            })
+        })
+    
+        const result = await response.json()
+    
+        if (result.success) {
+            alert("로그인 성공")
+        } else {
+            alert(result.message)
+        }
+    }
+    </script>
 </html>
+
+

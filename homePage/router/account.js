@@ -55,13 +55,14 @@ router.post("/login", async (req, res) => {
     
         const data = await client.query(sql, values) // await 앞에 변수를 붙여주는거지
         const row = data.rows
-        if (row.lenth > 0) {
+
+        if (row.lenth > 0) { // 행의 길이가 0보다 크면 insert된거지
             result.success = true
         } else {
             result.message = "회원정보가 잘못됐습니다."
         }
         res.send(result)
-    } catch(err) {
+    } catch(err) { // 아 어차피 캐로 다  들어가니까 그냥 쭉 쓰는거네
         result.message = err
         res.send(result)
     }
@@ -75,8 +76,45 @@ router.get("/logout", (req, res) => {
 })
 
 // 이것도 post 회원가입
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     
+    const idValue = req.body.id_value
+    const pwValue = req.body.pw_value
+    const nameValue = req.body.name_value
+    const emailValue = req.body.email_value
+
+    const result = {
+        "success": false,
+        "message": ""
+    }
+
+    const client = new Client({
+        user: "ubuntu",
+        password: "1234",
+        host: "localhost",
+        database: "stageus",
+        port: 5432
+    })
+
+    try {
+        await client.connect()
+
+        const sql = "INSERT INTO backend.account (id, pw, name, value) VALUES ($1, $2, $3, $4);"
+        const values = [idValue, pwValue, nameValue, emailValue]
+
+        const data = await client.query(sql, values) // 이것도 통신이니까
+        const row = data.rows
+
+        if (row.lenth > 0) { // insert된거겠지?
+            result.success = true
+        } else {
+            result.message = "회원정보가 잘못됐습니다."
+        }
+        res.send(result)
+    } catch(err) {
+        result.message = err
+        res.send(result)
+    }
 })
 
 // get /account/account 이거니까 account를 지워주는거야 그냥 /로만 이건 회원정보 가져오기
