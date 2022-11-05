@@ -50,7 +50,7 @@ router.post("/login", async (req, res) => {
     try {
         await client.connect() // await 붙여주는
         
-        const sql = "SELECT * FROM backend.account WHERE id=$1 and pw=$2;" // ? 대신 $로 대체 
+        const sql = 'SELECT * FROM backend.account WHERE id=$1 and pw=$2;' // ? 대신 $로 대체 
         const values = [idValue, pwValue]
     
         const data = await client.query(sql, values) // await 앞에 변수를 붙여주는거지
@@ -59,11 +59,12 @@ router.post("/login", async (req, res) => {
         if (row.lenth > 0) { // 행의 길이가 0보다 크면 insert된거지
             result.success = true
         } else {
-            result.message = "회원정보가 잘못됐습니다."
+            result.message = `${values}${data}${row}${row.lenth} 회원정보가 잘못됐습니다.`
         }
         res.send(result)
     } catch(err) { // 아 어차피 캐로 다  들어가니까 그냥 쭉 쓰는거네
         result.message = err
+        
         res.send(result)
     }
 })
