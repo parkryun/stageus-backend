@@ -21,8 +21,8 @@
     </main>
 
     <section id="find_container">
-        <a href="/find/findID">아이디 찾기</a>
-        <a href="/find/findPW">비밀번호 찾기</a>
+        <a href="/find-id">아이디 찾기</a>
+        <a href="/find-pw">비밀번호 찾기</a>
     </section>
 </body>
 
@@ -44,6 +44,7 @@
     
         if (result.success) {
             alert("로그인 성공")
+            location.href = "/main"
         } else {
             alert(result.message)
             console.log(result.message)

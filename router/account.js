@@ -1,25 +1,29 @@
 const router = require("express").Router()
 const { Client } = require("pg") // postgre import
 
+const result = {
+    "success": false,
+    "message": ""
+}
+
+// PostgreSQL 기본 설정 ( DB 계정 설정)
+const client = new Client({ // =위에 있는 Client를 받는데 
+    user: "ubuntu",
+    password: "1234",
+    host: "localhost",
+    database: "stageus",
+    port: 5432
+})
+
 // post /account/login 로그인 api
 router.post("/login", async (req, res) => {
 
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value
 
-    const result = {
-        "success": false,
-        "message": ""
-    }
-
-    // PostgreSQL 기본 설정 ( DB 계정 설정)
-    const client = new Client({ // =위에 있는 Client를 받는데 
-        user: "ubuntu",
-        password: "1234",
-        host: "localhost",
-        database: "stageus",
-        port: 5432
-    })
+    // if (idValue = '' || pwValue = '') { // null값 예외처리
+    //     result.message = ""
+    // }
 
     // // PostgreSQL 연결 (callback)
     // client.connect((err) => { // 이게 비동기함수 client.
@@ -52,28 +56,35 @@ router.post("/login", async (req, res) => {
         
         const sql = 'SELECT * FROM backend.account WHERE id=$1 and pw=$2;' // ? 대신 $로 대체 
         const values = [idValue, pwValue]
-
-        const data = await client.query(sql, values) // await 앞에 변수를 붙여주는거지
+        
+        const data = await client.query(sql, values)
         const row = data.rows
 
-        if (row.length > 0) { // 행의 길이가 0보다 크면 insert된거지
-            result.success = true
+        if (idValue == pwValue) { // 아이디 비밀번호 일치 예외처리
+            result.success = true // 로그인 성공
+            
+            req.session.user = {
+                id: row[0].id,
+                name: row[0].name,
+                email: row[0].email
+            }
+            // 여기에 세션
         } else {
-            result.message = `회원정보가 잘못됐습니다.`
+            result.message = `비밀번호가 일치하지 않습니다.`
         }
+
         res.send(result)
-    } catch(err) { // 아 어차피 캐로 다  들어가니까 그냥 쭉 쓰는거네
+    } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
         result.message = err
-        
         res.send(result)
     }
 })
 
-// 로그아웃 api  get이 맞나 참 어렵네
+// 로그아웃 api
 router.get("/logout", (req, res) => {
     req.session.destroy()
 
-    res.redirect("") // 로그인 페이지
+    res.redirect("/login") // 로그아웃 후 로그인 페이지
 })
 
 // 이것도 post 회원가입
@@ -84,33 +95,16 @@ router.post("/", async (req, res) => {
     const nameValue = req.body.name_value
     const emailValue = req.body.email_value
 
-    const result = {
-        "success": false,
-        "message": ""
-    }
-
-    const client = new Client({
-        user: "ubuntu",
-        password: "1234",
-        host: "localhost",
-        database: "stageus",
-        port: 5432
-    })
-
     try {
         await client.connect()
 
-        const sql = "INSERT INTO backend.account (id, pw, name, value) VALUES ($1, $2, $3, $4);"
+        const sql = 'INSERT INTO backend.account (id, pw, name, email) VALUES ($1, $2, $3, $4);'
         const values = [idValue, pwValue, nameValue, emailValue]
 
-        const data = await client.query(sql, values) // 이것도 통신이니까
-        const row = data.rows // 데이터의 실행결과
+        await client.query(sql, values)
 
-        if (row.lenth > 0) { // insert된거겠지?
-            result.success = true
-        } else {
-            result.message = "회원정보가 잘못됐습니다."
-        }
+        result.success = true
+
         res.send(result)
     } catch(err) {
         result.message = err
