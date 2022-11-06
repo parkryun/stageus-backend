@@ -94,7 +94,7 @@ router.post("/", async (req, res) => {
     const pwValue = req.body.pw_value
     const nameValue = req.body.name_value
     const emailValue = req.body.email_value
-
+    // 예외처리
     try {
         await client.connect()
 
