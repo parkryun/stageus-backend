@@ -10,13 +10,39 @@
     <h1>find ID</h1>
     <main id="find_id_container">
         <section id="find_id_input_container">
-            이름 : <input type="text" id="name_input" class="find_id_input">
-            이메일 : <input type="text" id="email_input" class="find_id_input">
+            이름 : <input type="text" id="find_id_input_name" class="find_id_input">
+            이메일 : <input type="text" id="find_id_input_email" class="find_id_input">
         </section>
         
         <section>
-            <input type="button" id="find_btn" value="아이디 찾기" onclick="location.href='/find/checkFindID'">
+            <input type="button" id="find_btn" value="아이디 찾기" onclick="findIdEvent()">
         </section>
     </main>
+    
 </body>
+<script>
+    const findIdEvent = async () => {
+    
+        const response = await fetch("/find/id", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name_value: document.getElementById("find_id_input_name").value,
+                email_value: document.getElementById("find_id_input_email").value
+            })
+        })
+    
+        const result = await response.json()
+    
+        if (result.success) {
+            alert(result.postList[0][0].id)
+            location.href = "/login"
+        } else {
+            alert(result.message)
+            console.log(result.message)
+        }
+    }
+    </script>
 </html>

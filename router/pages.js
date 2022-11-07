@@ -39,7 +39,7 @@ router.get("/find-pw", (req, res) => {
 
 // 비밀번호 변경 페이지
 router.get("/update-pw", (req, res) => {
-    res.sendFile(path.join(__dirname, "../htmlPage/findPW.html")) // 변경 페이지로 넣어야지
+    res.sendFile(path.join(__dirname, "../htmlPage/updatePW.html")) // 변경 페이지로 넣어야지
 })
 
 // 회원가입 페이지

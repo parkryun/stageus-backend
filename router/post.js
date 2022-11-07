@@ -218,7 +218,7 @@ router.delete("/comment", async (req, res) => {
         const sql = 'DELETE FROM backend.comment WHERE commentNum=$1;' 
         const values = commentNum
 
-        await client.query(sql)
+        await client.query(sql, values)
 
         res.send(result)
 
@@ -228,5 +228,4 @@ router.delete("/comment", async (req, res) => {
     }
 })
 
-// server.js에서 routing 모듈로 사용하게
 module.exports = router

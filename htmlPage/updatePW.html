@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>update PW</h1>
+    <main id="update_pw_container">
+        <section id="update_pw_input_container">
+            비밀번호 : <input type="text" id="update_pw_input_pw" class="update_pw_input">
+            비밀번호 확인 : <input type="text" id="update_pw_input_check" class="update_pw_input">
+        </section>
+        
+        <section>
+            <input type="button" id="update_pw_btn" value="비밀번호 변경" onclick="updatePwEvent()">
+        </section>
+    </main>
+</body>
+<script>
+    const updatePwEvent = async () => {
+    
+        const response = await fetch("/find/pw", {
+            method: "PUT", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                pw_value: document.getElementById("update_pw_input_pw").value,
+                pw_check_value: document.getElementById("update_pw_input_check").value
+                // 세션 아이디 넘기기
+            })
+        })
+    
+        const result = await response.json()
+    
+        if (result.success) {
+            location.href = "/login"
+        } else {
+            alert(result.message)
+            console.log(result.message)
+        }
+    }
+</script>
+</html>

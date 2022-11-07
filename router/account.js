@@ -54,13 +54,13 @@ router.post("/login", async (req, res) => {
     try {
         await client.connect() // await 붙여주는
         
-        const sql = 'SELECT * FROM backend.account WHERE id=$1 and pw=$2;' // ? 대신 $로 대체 
-        const values = [idValue, pwValue]
+        const sql = 'SELECT * FROM backend.account WHERE id=$1;' // ? 대신 $로 대체 
+        const values = idValue
         
         const data = await client.query(sql, values)
         const row = data.rows
 
-        if (idValue == pwValue) { // 아이디 비밀번호 일치 예외처리
+        if (pwValue == row[0].pw) { // 비밀번호 일치 예외처리
             result.success = true // 로그인 성공
             result.message = "로그인 성공"
             

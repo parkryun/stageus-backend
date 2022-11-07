@@ -10,14 +10,38 @@
     <h1>find PW</h1>
     <main id="find_pw_container">
         <section id="find_pw_input_container">
-            아이디 : <input type="text" id="id_input" class="find_pw_input">
-            이름 : <input type="text" id="name_input" class="find_pw_input">
+            아이디 : <input type="text" id="find_pw_input_id" class="find_pw_input">
+            이메일 : <input type="text" id="find_pw_input_email" class="find_pw_input">
         </section>
         
         <section>
             <!-- 비밀번호 수정 페이지 -->
-            <input type="button" id="find_btn" value="비밀번호 찾기" onclick="location.href='/find/checkFindID'">
+            <input type="button" id="find_btn" value="비밀번호 찾기" onclick="findPwEvent()">
         </section>
     </main>
 </body>
+<script>
+    const findPwEvent = async () => {
+    
+        const response = await fetch("/find/pw", {
+            method: "POST", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                id_value: document.getElementById("find_pw_input_id").value,
+                email_value: document.getElementById("find_pw_input_email").value
+            })
+        })
+    
+        const result = await response.json()
+    
+        if (result.success) {
+            location.href = "/update-pw"
+        } else {
+            alert(result.message)
+            console.log(result.message)
+        }
+    }
+    </script>
 </html>
