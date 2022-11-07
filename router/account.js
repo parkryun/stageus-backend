@@ -62,6 +62,7 @@ router.post("/login", async (req, res) => {
 
         if (idValue == pwValue) { // 아이디 비밀번호 일치 예외처리
             result.success = true // 로그인 성공
+            result.message = "로그인 성공"
             
             req.session.user = {
                 id: row[0].id,

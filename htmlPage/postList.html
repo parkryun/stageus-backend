@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kr">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -20,7 +20,7 @@
     
         <main id="board_container">
             <section id="board_list_container">
-                <table>
+                <table id="post_list_table">
                     <tr>
                         <th>번호</th>
                         <th>제목</th>
@@ -30,7 +30,7 @@
                     <tr>
                         <td>1</td>
                         <td>
-                            <a href="post.html">안녕</a>    
+                            <a href="/post">안녕</a>    
                         </td>
                         <td>박륜</td>
                         <td>2022-10-21</td>
@@ -38,7 +38,7 @@
                     <tr>
                         <td>2</td>
                         <td>
-                            <a href="post.html">하이</a>    
+                            <a href="/post">하이</a>    
                         </td>  
                         <td>박리윤</td>
                         <td>2022-10-20</td>
@@ -46,16 +46,17 @@
                     <tr>
                         <td>3</td>
                         <td>
-                            <a href="post.html">헬로</a>    
+                            <a href="/post">헬로</a>    
                         </td>
                         <td>박류운</td>
                         <td>2022-10-22</td>
                     </tr>
                 </table>
+
             </section>
     
             <section>
-                <input type="button" value="게시글 작성" id="write_post_btn" onclick="location.href='/post'">
+                <input type="button" value="게시글 작성" id="write_post_btn" onclick="window.location.href='/post-write'">
             </section>
         </main>
     </body>
@@ -63,7 +64,7 @@
 
     <script>
 
-        const getPostEvent = async () => {
+        const getPostListEvent = async () => {
             const response = await fetch("/post/list", {
                 method: "GET", 
                 headers: {
@@ -72,12 +73,39 @@
             })
         
             const result = await response.json()
-            
-            console.log(result.postList) // 리스트 가져왔고 이걸 프론트단에 뿌려줘
+            const postListArray = result.postList[0]
+
+            console.log(postListArray)
+
+            if (postListArray.length == 0) {
+                console.log("포스트가 없습니다.")
+            } else {
+                for (var index = 0; index < postListArray.length; index++) {
+                    let postTr = document.createElement('tr') // 포스트 Tr 
+                    let postNumTd = document.createElement('td') // 포스트 넘버 td
+                    let postTitleTd = document.createElement('td') // 제목 td
+                    let postNameTd = document.createElement('td') // 이름 td
+                    let postDateTd = document.createElement('td') // 날짜 td
+
+                    postTr.appendChild(postNumTd)
+                    postTr.appendChild(postTitleTd)
+                    postTr.appendChild(postNameTd)
+                    postTr.appendChild(postDateTd)
+                    document.getElementById("post_list_table").appendChild(postTr)
+
+                    // 여기 a태그로 링크 줘서 보내자 innerhtml부분
+                    postNumTd.innerHTML = postListArray[index].postnum
+                    postTitleTd.innerHTML = postListArray[index].posttitle
+                    postNameTd.innerHTML = postListArray[index].userid    // 나중에 유저네임으로 가져와
+                    postDateTd.innerHTML = postListArray[index].postdate
+
+                }
+            }
         }
 
-        window.open(getPostEvent())
-        
+        window.onload = function() {
+            getPostListEvent()
+        }
         </script>
 </body>
 </html>

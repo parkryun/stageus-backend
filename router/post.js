@@ -29,6 +29,8 @@ router.get("/list", async (req, res) => {
         const data = await client.query(sql)
         const row = data.rows
 
+        console.log(row[0])
+
         result.postList.push(row);
         res.send(result)
 
@@ -39,7 +41,7 @@ router.get("/list", async (req, res) => {
 })
 
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
-router.get("/", (req, res) => {    
+router.get("/", async (req, res) => {    
 
     const postNum = req.body.post_num
     result.post = []
@@ -69,21 +71,23 @@ router.get("/", (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/", (req, res) => {         
+router.post("/", async (req, res) => {         
 
-    const postTitleValue = req.body.post_title
-    const postContentValue = req.body.post_content
-    const idValue = req.body.id_value
+    const postTitleValue = req.body.post_title_value
+    const postContentValue = req.body.post_content_value
+    const idValue = "12" //req.body.id_value
 
 
     try {
         await client.connect()
         
-        const sql = 'INSERT INTO backend.post (postTitle, postContent, userId) * VALUES ($1, $2, $3);' // ? 대신 $로 대체 
+        const sql = 'INSERT INTO backend.post (postTitle, postContent, userId) VALUES ($1, $2, $3);' // ? 대신 $로 대체 
         const values = [postTitleValue, postContentValue, idValue]
 
         await client.query(sql, values)
 
+        result.success = true
+        result.message = "작성 완료"
         res.send(result)
 
     } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
@@ -93,7 +97,7 @@ router.post("/", (req, res) => {
 })
 
 // 게시글 수정api 
-router.put("/", (req, res) => {
+router.put("/", async (req, res) => {
 
     const postNum = req.body.post_num
     const postContentValue = req.body.post_content    
@@ -116,7 +120,7 @@ router.put("/", (req, res) => {
 })
 
 // 게시글 삭제api
-router.delete("/", (req, res) => {    
+router.delete("/", async (req, res) => {    
     
     const postNum = req.body.post_num
 
@@ -138,7 +142,7 @@ router.delete("/", (req, res) => {
 })
 
 // 댓글리스트 가져오기
-router.get("/comment-list", (req, res) => {    
+router.get("/comment-list", async (req, res) => {    
 
     result.commentList = []
 
@@ -160,7 +164,7 @@ router.get("/comment-list", (req, res) => {
 })
 
 // 댓글 작성
-router.post("/comment", (req, res) => {
+router.post("/comment", async (req, res) => {
     
     const commentContentValue = req.body.comment_content
     const idValue = req.body.id_value
@@ -168,7 +172,7 @@ router.post("/comment", (req, res) => {
     try {
         await client.connect()
         
-        const sql = 'INSERT INTO backend.comment (commentContent, userId) * VALUES ($1, $2);' // ? 대신 $로 대체 
+        const sql = 'INSERT INTO backend.comment (commentContent, userId) VALUES ($1, $2);' // ? 대신 $로 대체 
         const values = [commentContentValue, idValue]
 
         await client.query(sql, values)
@@ -182,7 +186,7 @@ router.post("/comment", (req, res) => {
 })
 
 // 댓글 수정
-router.put("/comment", (req, res) => {
+router.put("/comment", async (req, res) => {
 
     const commentNum = req.body.comment_num
     const commentContentValue = req.body.comment_content    
@@ -204,7 +208,7 @@ router.put("/comment", (req, res) => {
 })
 
 // 댓글 삭제
-router.delete("/comment", (req, res) => {
+router.delete("/comment", async (req, res) => {
 
     const commentNum = req.body.comment_num
 

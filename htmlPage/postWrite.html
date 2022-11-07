@@ -7,6 +7,43 @@
     <title>post Write</title>
 </head>
 <body>
-    <input type="button" id="write_post_btn" onclick="location.href='/write'">
+    <h1>post write</h1>
+    <main id="post_write_container">
+        <section id="post_write_content">
+            <input type="text" value="제목" id="post_write_input_title">
+            <input type="textarea" value="내용" id="post_write_input_content">
+        </section>
+
+        <section id="post_write_btn_container">
+            <input type="button" id="post_write_btn" value="작성완료" onclick="PostEvent()">
+        </section>
+
+    </main>
+
+    <script>
+        const PostEvent = async () => {
+            const response = await fetch("/post", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    post_title_value: document.getElementById("post_write_input_title").value,
+                    post_content_value: document.getElementById("post_write_input_content").value
+                    // id_value =  여기 세션으로 받아와야하는데
+                })
+            })
+        
+            const result = await response.json()
+            
+            if (result.success) {
+                alert(result.message)
+                location.href = "/post-list"
+            } else {
+                alert(result.message)
+                console.log(result.message)
+            }
+        }
+    </script>
 </body>
 </html>

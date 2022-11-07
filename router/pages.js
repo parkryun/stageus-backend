@@ -17,6 +17,11 @@ router.get("/post", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/post.html"))
 })
 
+// 게시글 보는 페이지
+router.get("/post-write", (req, res) => {
+    res.sendFile(path.join(__dirname, "../htmlPage/postWrite.html"))
+})
+
 // 게시판 목록 가져오기 ( 게시판 페이지 )
 router.get("/post-list", (req, res) => {         
     res.sendFile(path.join(__dirname, '../htmlPage/postList.html'))

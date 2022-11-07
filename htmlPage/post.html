@@ -8,59 +8,35 @@
 </head>
 <body>
     <h1>post</h1>
-    
+
     <main id="post_container">
-        <section id="post_content_container">
-            <div id="post_header">
-                <table>
-                    <tr>
-                        <th>작성자</th>
-                        <td>박륜</td>
-                    </tr>
-                    <tr>
-                        <th>제목</th>
-                        <td>헬로</td>
-                    </tr>
-                    <tr>
-                        <th>작성 날짜</th>
-                        <td>2022-10-20</td>
-                    </tr>
-                </table>
-            </div>
-            <p id="post_content">
-                안녕하세요?
-            </p>
+        <section id="post_content">
+
         </section>
 
-        <section id="post_comment_container">
-            <div id="comment_input_container">
-                <input type="text" id="comment_input" value="댓글을 작성해주세요.">
-                <input type="button" id="comment_input_btn" value="댓글 작성" onclick="location.href='/post/writeComment'">
-            </div>
-            <div id="comment_list_container">
-                <table>
-                    <tr>
-                        <td>네 안녕하세요</td>
-                        <td>박륜</td>
-                        <td>
-                            <input type="button" id="comment_update_btn" value="댓글 수정" onclick="location.href='/post/updateComment'">
-                            <input type="button" id="comment_remove_btn" value="댓글 삭제" onclick="location.href='/post/removeComment'">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>안녕 못합니다.</td>
-                        <td>박류운</td>
-                        <td>
-                            <input type="button" id="comment_update_btn" value="댓글 수정" onclick="location.href='/post/updateComment'">
-                            <input type="button" id="comment_remove_btn" value="댓글 삭제" onclick="location.href='/post/removeComment'">
-                        </td>
-                    </tr>
-                </table>
-            </div>
+        <section id="comment_list_container">
+
         </section>
+
     </main>
 
+    <script>
 
+        const getPostEvent = async () => {
+            const response = await fetch("/post", {
+                method: "GET", 
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            })
+        
+            const result = await response.json()
+            
+            console.log(result.postList) // 리스트 가져왔고 이걸 프론트단에 뿌려줘
+        }
 
+        window.onload(getPostEvent())
+        
+        </script>
 </body>
 </html>
