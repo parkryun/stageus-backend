@@ -24,7 +24,7 @@ router.get("/list", async (req, res) => {
     try {
         await client.connect() // await 붙여주는
         
-        const sql = 'SELECT * FROM backend.post;' // ? 대신 $로 대체 
+        const sql = 'SELECT * FROM backend.post;'
         
         const data = await client.query(sql)
         const row = data.rows
@@ -41,21 +41,28 @@ router.get("/list", async (req, res) => {
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
 router.get("/", (req, res) => {    
 
-    // const postNum = req.body.post_num
+    const postNum = req.body.post_num
+    result.post = []
+    result.commentList = []
 
     try {
         await client.connect() 
         
-        const sql = 'SELECT * FROM backend.post WHERE postNum=$1;' // ? 대신 $로 대체 
+        const sql1 = 'SELECT * FROM backend.post WHERE postNum=$1;'
+        const sql2 = 'SELECT * FROM backend.comment WHERE postNum=$1;'
         const values = postNum
 
-        const data = await client.query(sql, values)
-        const row = data.rows
+        const data1 = await client.query(sql1, values) // 게시글 가져오기
+        const data2 = await client.query(sql2, values) // 해당 게시글 댓글 가져오기
+        const row1 = data1.rows
+        const row2 = data2.rows
 
-        result.post.push(row);
+        result.post.push(row1)
+        result.commentList.push(row2)
+
         res.send(result)
 
-    } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
+    } catch(err) { 
         result.message = err
         res.send(result)
     }
@@ -146,7 +153,7 @@ router.get("/comment-list", (req, res) => {
         result.commentList.push(row);
         res.send(result)
 
-    } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
+    } catch(err) { 
         result.message = err
         res.send(result)
     }
