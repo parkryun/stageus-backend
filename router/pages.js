@@ -11,7 +11,6 @@ router.get("/main", (req, res) => {
 router.get("/main-session", (req, res) => {
     // res.sendFile(__dirname + "../htmlPage/mainPage.html")
     const user = req.session.user
-    console.log(user)
     res.send(user)
 })
 
@@ -60,6 +59,12 @@ router.get("/find-pw", (req, res) => {
 // 비밀번호 변경 페이지
 router.get("/update-pw", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/updatePW.html")) // 변경 페이지로 넣어야지
+})
+
+// 비밀번호 변경 아이디 session
+router.get("/update-pw-session", (req, res) => {
+    const user = req.session.user
+    res.send(user)
 })
 
 // 회원가입 페이지

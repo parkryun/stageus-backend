@@ -23,26 +23,35 @@ router.post("/id", async (req, res) => {
 
     const nameValue = req.body.name_value
     const emailValue = req.body.email_value
-    // 예외처리
-    try {
-        await client.connect()
 
-        const sql = 'SELECT * FROM backend.account WHERE name=$1;' // ? 대신 $로 대체 
-        const values = [nameValue]
-        
-        const data = await client.query(sql, values)
-        const row = data.rows
-
-        if (row[0].email == emailValue) { // 이메일 일치 예외처리
-            result.success = true
-            result.id = row[0].id // 아이디 넘겨주기
-        } else {
-            result.message = `회원정보가 정확하지 않습니다.`
+    if (nameValue == '' || emailValue == '') { // null값 예외처리
+        result.message = "작성해주세요"
+        return res.send(result)
+    } else {
+        try {
+            await client.connect()
+    
+            const sql = 'SELECT * FROM backend.account WHERE name=$1;' // ? 대신 $로 대체 
+            const values = [nameValue]
+            
+            const data = await client.query(sql, values)
+            const row = data.rows
+            
+            if (row.length > 0) {
+                if (row[0].email == emailValue) { // 이메일 일치 예외처리
+                    result.success = true
+                    result.id = row[0].id // 아이디 넘겨주기
+                } else {
+                    result.message = `회원정보가 정확하지 않습니다.`
+                }
+            } else {
+                result.message = "회원이 존재하지 않습니다"
+            }
+            res.send(result)
+        } catch(err) {
+            result.message = err
+            res.send(result)
         }
-        res.send(result)
-    } catch(err) {
-        result.message = err
-        res.send(result)
     }
 })
 
@@ -51,48 +60,72 @@ router.post("/pw", async (req, res) => {
         
     const idValue = req.body.id_value
     const emailValue = req.body.email_value
-    // 예외처리
-    try {
-        await client.connect()
 
-        const sql = 'SELECT * FROM backend.account WHERE id=$1;' // ? 대신 $로 대체 
-        const values = [idValue]
+    if (idValue == '' || emailValue == '') { // null값 예외처리
+        result.message = "작성해주세요"
+        return res.send(result)
+    } else {
+        try {
+            await client.connect()
+    
+            const sql = 'SELECT * FROM backend.account WHERE id=$1;' // ? 대신 $로 대체 
+            const values = [idValue]
+            
+            const data = await client.query(sql, values)
+            const row = data.rows
+    
+            if (row.length > 0) {
+                if (row[0].email == emailValue) { // 이메일 일치 예외처리
+                    req.session.user = {
+                        id: row[0].id
+                    } // 세션으로 아이디 넘기고
         
-        const data = await client.query(sql, values)
-        const row = data.rows
-
-        if (row[0].email == emailValue) { // 이메일 일치 예외처리
-            result.success = true
-            // 아이디 세션으로 넘기고
-        } else {
-            result.message = `회원정보가 정확하지 않습니다.`
+                    result.success = true
+                } else {
+                    result.message = `회원정보가 정확하지 않습니다.`
+                }
+            } else {
+                result.message = "아이디가 존재하지 않습니다."
+            }
+            res.send(result)
+        } catch(err) {
+            result.message = err
+            res.send(result)
         }
-        res.send(result)
-    } catch(err) {
-        result.message = err
-        res.send(result)
     }
 })
 
 // 비밀번호 변경
 router.put("/pw", async (req, res) => {
-
     const pwValue = req.body.pw_value
     const pwCheckValue = req.body.pw_check_value
-    // 세션 아이디 받기
-    
-    try {
-        await client.connect()
+    const idValue = req.body.id_value
 
-        const sql = 'UPDATE backend.account SET pw=$1; WHERE id=$2;' // ? 대신 $로 대체 
-        const values = [pwValue, idValue]
+    if (pwValue == '' || pwCheckValue == '' || idValue == undefined) { // null값 예외처리
+        result.message = "작성해주세요"
+        return res.send(result)
+    } else {
+        if (pwValue != pwCheckValue) { // 일차 예외처리
+            result.message = "비밀번호가 일치하지 않습니다"
+            return res.send(result)
+        } else {
+            try {
+                await client.connect()
+                
+                const sql = 'UPDATE backend.account SET pw=$1; WHERE id=$2;' // ? 대신 $로 대체 
+                const values = [pwValue, idValue]
+                
+                await client.query(sql, values)
+                
+                req.session.user.destroy() // 세션 지우고
         
-        await client.query(sql, values)
-
-        res.send(result)
-    } catch(err) {
-        result.message = err
-        res.send(result)
+                result.success = true
+                res.send(result)
+            } catch(err) {
+                result.message = err
+                res.send(result)
+            }             
+        }
     }
 })
 

@@ -20,8 +20,21 @@
     </main>
 </body>
 <script>
-    const updatePwEvent = async () => {
+    let userID = ""
+
+    const getsession = async () => {
+        const responseSession = await fetch("/update-pw-session", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
     
+        user = await responseSession.json()
+        userID = user.id
+    }
+
+    const updatePwEvent = async () => {
         const response = await fetch("/find/pw", {
             method: "PUT", 
             headers: {
@@ -29,13 +42,15 @@
             },
             body: JSON.stringify({
                 pw_value: document.getElementById("update_pw_input_pw").value,
-                pw_check_value: document.getElementById("update_pw_input_check").value
+                pw_check_value: document.getElementById("update_pw_input_check").value,
+                id_value: userID
                 // 세션 아이디 넘기기
             })
         })
-    
+
         const result = await response.json()
-    
+        console.log(1)
+
         if (result.success) {
             location.href = "/login"
         } else {
@@ -43,5 +58,8 @@
             console.log(result.message)
         }
     }
+
+    getsession()
+
 </script>
 </html>

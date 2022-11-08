@@ -25,7 +25,11 @@
         })
     
         user = await response.json()
-        console.log(user)
+
+        if(user == undefined) { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            location.href = "/login"
+        }
 
         document.getElementById("p_id").innerHTML = `${user.id}님 안녕하세요!`
     }
