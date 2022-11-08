@@ -75,8 +75,7 @@ router.post("/", async (req, res) => {
 
     const postTitleValue = req.body.post_title_value
     const postContentValue = req.body.post_content_value
-    const idValue = "12" //req.body.id_value
-
+    const idvalue = req.bodu.id_value
 
     try {
         await client.connect()

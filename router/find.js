@@ -1,6 +1,6 @@
-const express = require("express")
-const path = require("path")
-const router = express.Router()
+const router = require("express").Router()
+const { Client } = require("pg") 
+
 
 const result = {
     "success": false,
@@ -28,7 +28,7 @@ router.post("/id", async (req, res) => {
         await client.connect()
 
         const sql = 'SELECT * FROM backend.account WHERE name=$1;' // ? 대신 $로 대체 
-        const values = nameValue
+        const values = [nameValue]
         
         const data = await client.query(sql, values)
         const row = data.rows
@@ -56,7 +56,7 @@ router.post("/pw", async (req, res) => {
         await client.connect()
 
         const sql = 'SELECT * FROM backend.account WHERE id=$1;' // ? 대신 $로 대체 
-        const values = idValue
+        const values = [idValue]
         
         const data = await client.query(sql, values)
         const row = data.rows

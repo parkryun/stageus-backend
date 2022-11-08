@@ -37,7 +37,7 @@
         const result = await response.json()
     
         if (result.success) {
-            alert(result.postList[0][0].id)
+            alert(`아이디는 ${result.id}입니다.`)
             location.href = "/login"
         } else {
             alert(result.message)

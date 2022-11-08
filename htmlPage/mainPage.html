@@ -7,11 +7,30 @@
     <title>mainPage</title>
 </head>
 <body>
-    <script>
-        
-    </script>
+
     <h1>main page</h1>
     <!-- 세션 받아오기 -->
-    <p> %{session.user.id} 님 안녕하세요!</p>
+    <p> ${user.id} 님 안녕하세요!</p>
+    <p id="p_id"> ${user.id} 님 안녕하세요!</p>
+
 </body>
+<script>
+    let user = {}
+    const getsession = async () => {
+        const response = await fetch("/main-session", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    
+        user = await response.json()
+        console.log(user)
+
+        document.getElementById("p_id").innerHTML = `${user.id}님 안녕하세요!`
+    }
+
+    getsession()
+</script>
+
 </html>

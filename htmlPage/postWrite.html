@@ -21,6 +21,20 @@
     </main>
 </body>
 <script>
+    getsession()    
+
+    const getsession = async () => {
+        const response = await fetch("/main-session", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    
+        const user = await response.json()
+        console.log(user)
+    }
+
     const PostEvent = async () => {
         const response = await fetch("/post", {
             method: "POST", 
@@ -29,7 +43,8 @@
             },
             body: JSON.stringify({
                 post_title_value: document.getElementById("post_write_input_title").value,
-                post_content_value: document.getElementById("post_write_input_content").value
+                post_content_value: document.getElementById("post_write_input_content").value,
+                id_value : user.id
                 // id_value =  여기 세션으로 받아와야하는데
             })
         })
@@ -44,5 +59,6 @@
             console.log(result.message)
         }
     }
+
 </script>
 </html>

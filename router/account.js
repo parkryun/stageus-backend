@@ -1,10 +1,11 @@
 const router = require("express").Router()
-const { Client } = require("pg") // postgre import
+const { Client } = require("pg") 
+const path = require("path")
 
 const result = {
     "success": false,
     "message": ""
-}
+}    
 
 // PostgreSQL 기본 설정 ( DB 계정 설정)
 const client = new Client({ // =위에 있는 Client를 받는데 
@@ -54,9 +55,9 @@ router.post("/login", async (req, res) => {
     try {
         await client.connect() // await 붙여주는
         
-        const sql = 'SELECT * FROM backend.account WHERE id=$1;' // ? 대신 $로 대체 
-        const values = idValue
-        
+        const sql = 'SELECT * FROM backend.account WHERE id=$1;'
+        const values = [idValue]
+
         const data = await client.query(sql, values)
         const row = data.rows
 
@@ -69,12 +70,11 @@ router.post("/login", async (req, res) => {
                 name: row[0].name,
                 email: row[0].email
             }
-            // 여기에 세션
         } else {
             result.message = `비밀번호가 일치하지 않습니다.`
         }
-
         res.send(result)
+
     } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
         result.message = err
         res.send(result)

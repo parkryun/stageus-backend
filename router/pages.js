@@ -7,6 +7,14 @@ router.get("/main", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/mainPage.html"))
 })
 
+// get mainpage session
+router.get("/main-session", (req, res) => {
+    // res.sendFile(__dirname + "../htmlPage/mainPage.html")
+    const user = req.session.user
+    console.log(user)
+    res.send(user)
+})
+
 // 로그인페이지 가져오기
 router.get("/login", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
@@ -17,9 +25,21 @@ router.get("/post", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/post.html"))
 })
 
-// 게시글 보는 페이지
+// 댓글 남길때 session
+router.get("/comment-session", (req, res) => {
+    const user = req.session.user
+    res.send(user)
+})
+
+// 게시글 작성 페이지
 router.get("/post-write", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/postWrite.html"))
+})
+
+// 게시글 작성 session
+router.get("/post-write-session", (req, res) => {
+    const user = req.session.user
+    res.send(user)
 })
 
 // 게시판 목록 가져오기 ( 게시판 페이지 )
