@@ -31,7 +31,13 @@
         })
     
         user = await responseSession.json()
-        userID = user.id
+
+        if(user.message == '세션없음') { // 세션값이 없을 때
+            alert("입력해주세요")
+            location.href = "/find-pw"
+        } else {
+            userId = user.id
+        }
     }
 
     const updatePwEvent = async () => {

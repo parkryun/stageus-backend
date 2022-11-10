@@ -21,22 +21,29 @@
     </main>
 </body>
 <script>
-    getsession()    
+    let userId = ""
 
     const getsession = async () => {
-        const response = await fetch("/main-session", {
+        const response = await fetch("/post-write-session", {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json"
             }
         })
     
-        const user = await response.json()
+        let user = await response.json()
         console.log(user)
+        
+        if(user.message == '세션없음') { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            location.href = "/login"
+        } else {
+            userId = user.id
+        }
     }
 
     const PostEvent = async () => {
-        const response = await fetch("/post", {
+        const response = await fetch("/post/", {
             method: "POST", 
             headers: {
                 "Content-Type": "application/json"
@@ -44,8 +51,7 @@
             body: JSON.stringify({
                 post_title_value: document.getElementById("post_write_input_title").value,
                 post_content_value: document.getElementById("post_write_input_content").value,
-                id_value : user.id
-                // id_value =  여기 세션으로 받아와야하는데
+                id_value : userId
             })
         })
     
@@ -59,6 +65,8 @@
             console.log(result.message)
         }
     }
+
+    getsession()    
 
 </script>
 </html>

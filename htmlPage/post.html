@@ -8,22 +8,26 @@
 </head>
 <body>
     <h1>post</h1>
-
     <main id="post_container">
         <section id="post_content">
 
         </section>
 
+        <input type="button" id="post_remove_btn">
+
+        <input type="button" id="post_update_btn">
+
         <section id="comment_list_container">
 
         </section>
+
+        
 
     </main>
 
 
 </body>
 <script>
-
     const getPostEvent = async () => {
         const response = await fetch("/post", {
             method: "GET", 
@@ -33,11 +37,50 @@
         })
     
         const result = await response.json()
-        
-        console.log(result.postList) // 리스트 가져왔고 이걸 프론트단에 뿌려줘
+        const post = result.post[0]
+        const commentListArray = result.commentList
+
+        console.log(post)
+        console.log(commentListArray)
+
+        let postTitleDiv = document.createElement('div') 
+        let postContentDiv = document.createElement('div') 
+        let userIdDiv = document.createElement('div') 
+
+        document.getElementById("post_content").appendChild(postTitleDiv)
+        document.getElementById("post_content").appendChild(postContentDiv)
+        document.getElementById("post_content").appendChild(userIdDiv)
+
+        postTitleDiv.innerHTML = post.posttitle
+        postContentDiv.innerHTML = post.postcontent
+        userIdDiv.innerHTML = post.userid
+
+        if (commentListArray.length == 0) {
+            let commentContentDiv = document.createElement('div') 
+            let commentUserIdIdv = document.createElement('div') 
+
+            document.getElementById("comment_list_container").appendChild(commentContentDiv)
+            document.getElementById("comment_list_container").appendChild(commentUserIdIdv)
+
+            commentContentDiv.innerHTML = "댓글이 없습니다."
+        } else {
+            for (var index = 0; index < commentListArray.length; index++) {
+                let commentContentDiv = document.createElement('div') 
+                let commentUserIdIdv = document.createElement('div') 
+
+                document.getElementById("post_content").appendChild(postTitleDiv)
+                document.getElementById("post_content").appendChild(postContentDiv)
+                document.getElementById("post_content").appendChild(userIdDiv)
+
+                document.getElementById("comment_list_container").appendChild(commentContentDiv)
+                document.getElementById("comment_list_container").appendChild(commentUserIdIdv)
+
+                commentContentDiv.innerHTML = commentListArray[index].commentcontent
+                commentUserIdIdv.innerHTML = commentListArray[index].userid
+            }
+        }
     }
 
-    window.onload(getPostEvent())
-    
+    getPostEvent()    
 </script>
 </html>

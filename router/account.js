@@ -1,11 +1,5 @@
 const router = require("express").Router()
 const { Client } = require("pg") 
-const path = require("path")
-
-const result = {
-    "success": false,
-    "message": ""
-}    
 
 // PostgreSQL 기본 설정 ( DB 계정 설정)
 const client = new Client({ // =위에 있는 Client를 받는데 
@@ -18,6 +12,11 @@ const client = new Client({ // =위에 있는 Client를 받는데
 
 // post /account/login 로그인 api
 router.post("/login", async (req, res) => {
+
+    const result = {
+        "success": false,
+        "message": "",
+    }
 
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value
@@ -92,13 +91,25 @@ router.post("/login", async (req, res) => {
 
 // 로그아웃 api
 router.get("/logout", (req, res) => {
-    req.session.user.destroy()
 
-    res.redirect("/login") // 로그아웃 후 로그인 페이지 프론트에서 해버릴까
+    const result = {
+        "success": false,
+        "message": "",
+    }
+
+    req.session.destroy()
+
+    result.success = true
+    res.send(result)
 })
 
 // 이것도 post 회원가입
 router.post("/", async (req, res) => {
+
+    const result = {
+        "success": false,
+        "message": "",
+    }
     
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value

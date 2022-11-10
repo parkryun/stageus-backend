@@ -1,6 +1,12 @@
 const router = require("express").Router() 
 const path = require("path")
 
+const result = {
+    "success": false,
+    "message": "",
+    "post": []
+}   
+
 // get //mainPage
 router.get("/main", (req, res) => {
     // res.sendFile(__dirname + "../htmlPage/mainPage.html")
@@ -10,8 +16,14 @@ router.get("/main", (req, res) => {
 // get mainpage session
 router.get("/main-session", (req, res) => {
     // res.sendFile(__dirname + "../htmlPage/mainPage.html")
-    const user = req.session.user
-    res.send(user)
+    let user = req.session.user
+    if (user) {
+        res.send(user)
+    } else {
+        result.message = "세션없음"
+        console.log(result)
+        res.send(result)
+    }
 })
 
 // 로그인페이지 가져오기
@@ -20,14 +32,20 @@ router.get("/login", (req, res) => {
 })
 
 // 게시글 보는 페이지
-router.get("/post", (req, res) => {
+router.get("/postPage", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/post.html"))
 })
 
 // 댓글 남길때 session
 router.get("/comment-session", (req, res) => {
-    const user = req.session.user
-    res.send(user)
+    let user = req.session.user
+    if (user) {
+        res.send(user)
+    } else {
+        result.message = "세션없음"
+        console.log(result)
+        res.send(result)
+    }
 })
 
 // 게시글 작성 페이지
@@ -37,8 +55,14 @@ router.get("/post-write", (req, res) => {
 
 // 게시글 작성 session
 router.get("/post-write-session", (req, res) => {
-    const user = req.session.user
-    res.send(user)
+    let user = req.session.user
+    if (user) {
+        res.send(user)
+    } else {
+        result.message = "세션없음"
+        console.log(result)
+        res.send(result)
+    }
 })
 
 // 게시판 목록 가져오기 ( 게시판 페이지 )
@@ -63,8 +87,14 @@ router.get("/update-pw", (req, res) => {
 
 // 비밀번호 변경 아이디 session
 router.get("/update-pw-session", (req, res) => {
-    const user = req.session.user
-    res.send(user)
+    let user = req.session.user
+    if (user) {
+        res.send(user)
+    } else {
+        result.message = "세션없음"
+        console.log(result)
+        res.send(result)
+    }
 })
 
 // 회원가입 페이지

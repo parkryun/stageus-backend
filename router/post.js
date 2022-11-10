@@ -1,11 +1,5 @@
 const router = require("express").Router()
-const { Client } = require("pg") 
-
-const result = {
-    "success": false,
-    "message": "",
-    "post": []
-}    
+const { Client } = require("pg")     
 
 // PostgreSQL 기본 설정 ( DB 계정 설정)
 const client = new Client({ // =위에 있는 Client를 받는데 
@@ -19,7 +13,11 @@ const client = new Client({ // =위에 있는 Client를 받는데
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
 
-    result.postList = []
+    const result = {
+        "success": false,
+        "message": "",
+        "postList": []
+    }
 
     try {
         await client.connect() // await 붙여주는
@@ -37,16 +35,22 @@ router.get("/list", async (req, res) => {
         res.send(result)
     } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
         result.message = err
+        console.log(err.message)
         res.send(result)
     }
 })
 
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
 router.get("/", async (req, res) => {    
+    
+    const result = {
+        "success": false,
+        "message": "",
+        "post": [],
+        "commentList": []
+    }
 
     const postNum = req.body.post_num
-    result.post = []
-    result.commentList = []
 
     try {
         await client.connect() 
@@ -64,6 +68,8 @@ router.get("/", async (req, res) => {
             result.post.push(row1)
             if (row2.length > 0) {
                 result.commentList.push(row2)
+            } else {
+                result.commentList.push("댓글없음")
             }
         } else {
             result.message = '해당 게시글이 존재하지 않습니다.'
@@ -76,11 +82,16 @@ router.get("/", async (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/", async (req, res) => {         
+router.post("/", async (req, res) => {        
+    
+    const result = {
+        "success": false,
+        "message": "",
+    }
 
     const postTitleValue = req.body.post_title_value
     const postContentValue = req.body.post_content_value
-    const idValue = req.bodu.id_value
+    const idValue = req.body.id_value
 
     if (postTitleValue == '' || postContentValue == '' || idValue == undefined) { // null값 예외처리
         result.message = "제목 또는 내용을 입력하세요"
@@ -89,16 +100,16 @@ router.post("/", async (req, res) => {
         try {
             await client.connect()
             
-            const sql = 'INSERT INTO backend.post (postTitle, postContent, userId) VALUES ($1, $2, $3);' // ? 대신 $로 대체 
+            const sql = 'INSERT INTO backend.post (postTitle, postContent, userId) VALUES ($1, $2, $3);'
             const values = [postTitleValue, postContentValue, idValue]
-    
+            
             await client.query(sql, values)
-    
+
             result.success = true
             result.message = "작성 완료"
             res.send(result)
         } catch(err) { 
-            result.message = err
+            result.message = err.message
             res.send(result)
         }
     }
@@ -106,6 +117,11 @@ router.post("/", async (req, res) => {
 
 // 게시글 수정api 
 router.put("/", async (req, res) => {
+
+    const result = {
+        "success": false,
+        "message": "",
+    }
 
     const postNum = req.body.post_num
     const postContentValue = req.body.post_content    
@@ -132,6 +148,11 @@ router.put("/", async (req, res) => {
 
 // 게시글 삭제api
 router.delete("/", async (req, res) => {    
+
+    const result = {
+        "success": false,
+        "message": "",
+    }
     
     const postNum = req.body.post_num
 
@@ -157,6 +178,11 @@ router.delete("/", async (req, res) => {
 
 // 댓글 작성
 router.post("/comment", async (req, res) => {
+
+    const result = {
+        "success": false,
+        "message": "",
+    }
     
     const commentContentValue = req.body.comment_content
     const idValue = req.body.id_value
@@ -184,6 +210,11 @@ router.post("/comment", async (req, res) => {
 // 댓글 수정
 router.put("/comment", async (req, res) => {
 
+    const result = {
+        "success": false,
+        "message": "",
+    }
+
     const commentNum = req.body.comment_num
     const commentContentValue = req.body.comment_content    
 
@@ -209,6 +240,11 @@ router.put("/comment", async (req, res) => {
 
 // 댓글 삭제
 router.delete("/comment", async (req, res) => {
+
+    const result = {
+        "success": false,
+        "message": "",
+    }
 
     const commentNum = req.body.comment_num
 

@@ -10,9 +10,12 @@
 
     <h1>main page</h1>
     <!-- 세션 받아오기 -->
-    <p> ${user.id} 님 안녕하세요!</p>
     <p id="p_id"> ${user.id} 님 안녕하세요!</p>
+    <input type="button" id="logout_btn" value="로그아웃" onclick="logoutEvent()">
 
+    <section id="post_list_location_container">
+        <a href="/post-list">게시물 보기</a>
+    </section>
 </body>
 <script>
     let user = {}
@@ -24,14 +27,33 @@
             }
         })
     
-        user = await response.json()
+        let user = await response.json()
 
-        if(user == undefined) { // 세션값이 없을 때
+        if(user.message == '세션없음') { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
             location.href = "/login"
+        } else {
+            userId = user.id
+            
+            document.getElementById("p_id").innerHTML = `${user.name}님 안녕하세요!`
         }
+    }
 
-        document.getElementById("p_id").innerHTML = `${user.id}님 안녕하세요!`
+    const logoutEvent = async () => {
+        const response = await fetch("/account/logout", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        const result = await response.json()
+
+        if (result.success) {
+            location.href = '/login'
+        } else {
+            alert(result.message)
+            console.log(result.message)
+        }
     }
 
     getsession()
