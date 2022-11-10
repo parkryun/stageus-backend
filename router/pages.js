@@ -1,5 +1,6 @@
 const router = require("express").Router() 
 const path = require("path")
+const clientOption = require("./client")
 
 const result = {
     "success": false,
@@ -28,6 +29,9 @@ router.get("/main-session", (req, res) => {
 
 // 로그인페이지 가져오기
 router.get("/login", (req, res) => {
+
+    console.log(clientOption)
+
     res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
 })
 

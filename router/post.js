@@ -1,14 +1,6 @@
 const router = require("express").Router()
+const clientOption = require("./client")
 const { Client } = require("pg")     
-
-// PostgreSQL 기본 설정 ( DB 계정 설정)
-const client = new Client({ // =위에 있는 Client를 받는데 
-    user: "ubuntu",
-    password: "1234",
-    host: "localhost",
-    database: "stageus",
-    port: 5432
-})
 
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
@@ -18,6 +10,8 @@ router.get("/list", async (req, res) => {
         "message": "",
         "postList": []
     }
+
+    const client = new Client(clientOption)
 
     try {
         await client.connect() // await 붙여주는
@@ -49,6 +43,8 @@ router.get("/", async (req, res) => {
         "post": [],
         "commentList": []
     }
+
+    const client = new Client(clientOption)
 
     const postNum = req.body.post_num
 
@@ -89,6 +85,8 @@ router.post("/", async (req, res) => {
         "message": "",
     }
 
+    const client = new Client(clientOption)
+
     const postTitleValue = req.body.post_title_value
     const postContentValue = req.body.post_content_value
     const idValue = req.body.id_value
@@ -123,6 +121,8 @@ router.put("/", async (req, res) => {
         "message": "",
     }
 
+    const client = new Client(clientOption)
+
     const postNum = req.body.post_num
     const postContentValue = req.body.post_content    
     
@@ -153,6 +153,8 @@ router.delete("/", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    const client = new Client(clientOption)
     
     const postNum = req.body.post_num
 
@@ -183,6 +185,8 @@ router.post("/comment", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    const client = new Client(clientOption)
     
     const commentContentValue = req.body.comment_content
     const idValue = req.body.id_value
@@ -215,6 +219,8 @@ router.put("/comment", async (req, res) => {
         "message": "",
     }
 
+    const client = new Client(clientOption)
+
     const commentNum = req.body.comment_num
     const commentContentValue = req.body.comment_content    
 
@@ -245,6 +251,8 @@ router.delete("/comment", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    const client = new Client(clientOption)
 
     const commentNum = req.body.comment_num
 

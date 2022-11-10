@@ -1,14 +1,9 @@
 const router = require("express").Router()
+const clientOption = require("./client")
 const { Client } = require("pg") 
 
 // PostgreSQL 기본 설정 ( DB 계정 설정)
-const client = new Client({ // =위에 있는 Client를 받는데 
-    user: "ubuntu",
-    password: "1234",
-    host: "localhost",
-    database: "stageus",
-    port: 5432
-})
+
 
 // post /account/login 로그인 api
 router.post("/login", async (req, res) => {
@@ -17,6 +12,8 @@ router.post("/login", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    const client = new Client(clientOption)
 
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value
@@ -110,6 +107,8 @@ router.post("/", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    const client = new Client(clientOption)
     
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value
