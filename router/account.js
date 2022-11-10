@@ -51,6 +51,11 @@ router.post("/login", async (req, res) => {
     if (idValue == '' || pwValue == '') { // null값 예외처리
         result.message = "작성해주세요"
         return res.send(result)
+    }
+
+    if (idValue.length > 10 || pwValue.length > 10) {   // 길이 체크
+        result.message = "정보를 다시 입력해주세요"
+        return res.send(result)
     } else {
         try {
             await client.connect() // await 붙여주는
@@ -109,7 +114,7 @@ router.post("/", async (req, res) => {
     }
 
     const client = new Client(clientOption)
-    
+
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value
     const nameValue = req.body.name_value
@@ -117,6 +122,11 @@ router.post("/", async (req, res) => {
 
     if (idValue == '' || pwValue == '' || nameValue == '' || emailValue == '') { // null값 예외처리
         result.message = "작성해주세요"
+        return res.send(result)
+    }
+
+    if (idValue.length > 10 || pwValue.length > 10 || nameValue.length > 10 || emailValue.length > 20) {   // 길이 체크
+        result.message = "정보를 다시 입력해주세요"
         return res.send(result)
     } else {
         try {

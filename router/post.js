@@ -28,7 +28,7 @@ router.get("/list", async (req, res) => {
         }
         res.send(result)
     } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
-        result.message = err
+        result.message = err.message
         console.log(err.message)
         res.send(result)
     }
@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
         }
         res.send(result)
     } catch(err) { 
-        result.message = err
+        result.message = err.message
         res.send(result)
     }
 })
@@ -93,6 +93,11 @@ router.post("/", async (req, res) => {
 
     if (postTitleValue == '' || postContentValue == '' || idValue == undefined) { // null값 예외처리
         result.message = "제목 또는 내용을 입력하세요"
+        return res.send(result)
+    }
+
+    if (postTitleValue.length > 20 || postContentValue.length > 100) {   // 길이 체크
+        result.message = "정보를 다시 입력해주세요"
         return res.send(result)
     } else {
         try {
@@ -125,9 +130,14 @@ router.put("/", async (req, res) => {
 
     const postNum = req.body.post_num
     const postContentValue = req.body.post_content    
-    
+
     if (postContentValue == '' || postNum == undefined) { // null값 예외처리
         result.message = "작성해주세요"
+        return res.send(result)
+    }
+    
+    if (postContentValue.length > 100) {   // 길이 체크
+        result.message = "정보를 다시 입력해주세요"
         return res.send(result)
     } else {
         try {
@@ -194,6 +204,11 @@ router.post("/comment", async (req, res) => {
     if (commentContentValue == '' || idValue == undefined) { // null값 예외처리
         result.message = "댓글을 입력하세요"
         return res.send(result)
+    }
+
+    if (commentContentValue.length > 30) {   // 길이 체크
+        result.message = "정보를 다시 입력해주세요"
+        return res.send(result)
     } else {
         try {
             await client.connect()
@@ -226,6 +241,10 @@ router.put("/comment", async (req, res) => {
 
     if (commentContentValue == '' || commentNum == undefined) { // null값 예외처리
         result.message = "작성해주세요"
+        return res.send(result)
+    }
+    if (commentContentValue.length > 30) {   // 길이 체크
+        result.message = "정보를 다시 입력해주세요"
         return res.send(result)
     } else {
         try {
