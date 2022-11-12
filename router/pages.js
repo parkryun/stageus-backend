@@ -8,6 +8,8 @@ const result = {
     "post": []
 }   
 
+let postNum = ""
+
 // get //mainPage
 router.get("/main", (req, res) => {
     // res.sendFile(__dirname + "../htmlPage/mainPage.html")
@@ -34,7 +36,14 @@ router.get("/login", (req, res) => {
 
 // 게시글 보는 페이지
 router.get("/postPage", (req, res) => {
-    res.sendFile(path.join(__dirname, "../htmlPage/post.html"))
+    postNum = req.query.postNum
+    console.log(postNum)
+
+    res.sendFile(path.join(__dirname, "../htmlPage/post.html"), postNum)
+})
+
+router.get("/postPage-postNum", (req, res) => {
+    res.send(postNum)
 })
 
 // 댓글 남길때 session

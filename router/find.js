@@ -1,14 +1,6 @@
 const router = require("express").Router()
+const clientOption = require("./client")
 const { Client } = require("pg") 
-
-// PostgreSQL 기본 설정 ( DB 계정 설정)
-const client = new Client({ // =위에 있는 Client를 받는데 
-    user: "ubuntu",
-    password: "1234",
-    host: "localhost",
-    database: "stageus",
-    port: 5432
-})
 
 // 아이디 찾기
 router.post("/id", async (req, res) => {
@@ -16,10 +8,10 @@ router.post("/id", async (req, res) => {
     const result = {
         "success": false,
         "message": "",
+        "id": ""
     }
+    const client = new Client(clientOption)
     
-    result.id = ""
-
     const nameValue = req.body.name_value
     const emailValue = req.body.email_value
 
@@ -66,6 +58,7 @@ router.post("/pw", async (req, res) => {
         "success": false,
         "message": "",
     }
+    const client = new Client(clientOption)
         
     const idValue = req.body.id_value
     const emailValue = req.body.email_value
@@ -116,6 +109,8 @@ router.put("/pw", async (req, res) => {
         "success": false,
         "message": "",
     }
+    const client = new Client(clientOption)
+
     const pwValue = req.body.pw_value
     const pwCheckValue = req.body.pw_check_value
     const idValue = req.body.id_value

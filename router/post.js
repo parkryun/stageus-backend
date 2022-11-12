@@ -43,36 +43,35 @@ router.get("/", async (req, res) => {
         "post": [],
         "commentList": []
     }
-
     const client = new Client(clientOption)
-
-    const postNum = req.body.post_num
+    const postNum = req.body.postNum_value
 
     try {
         await client.connect() 
         
         const sql1 = 'SELECT * FROM backend.post WHERE postNum=$1;'
-        const sql2 = 'SELECT * FROM backend.comment WHERE postNum=$1;'
+        // const sql2 = 'SELECT * FROM backend.comment WHERE postNum=$1;'
         const values = postNum
 
         const data1 = await client.query(sql1, values) // 게시글 가져오기
-        const data2 = await client.query(sql2, values) // 해당 게시글 댓글 가져오기
+        // const data2 = await client.query(sql2, values) // 해당 게시글 댓글 가져오기
         const row1 = data1.rows
-        const row2 = data2.rows
+        // const row2 = data2.rows
 
         if (row1.length > 0) {
             result.post.push(row1)
-            if (row2.length > 0) {
-                result.commentList.push(row2)
-            } else {
-                result.commentList.push("댓글없음")
-            }
+            // if (row2.length > 0) {
+            //     result.commentList.push(row2)
+            // } else {
+                // result.commentList.push("댓글없음")
+            // }
         } else {
             result.message = '해당 게시글이 존재하지 않습니다.'
         }
         res.send(result)
     } catch(err) { 
         result.message = err.message
+        console.log(result.message)
         res.send(result)
     }
 })
