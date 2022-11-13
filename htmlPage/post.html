@@ -28,20 +28,25 @@
 
 </body>
 <script>
+    let postNum = ""
+
     const getPostEvent = async () => {
         const response = await fetch("/post", {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json"
-            }
-        })
+            },
+            body: JSON.stringify({
+                postNum_value: postNum
+            })
+        }) 
     
         const result = await response.json()
         const post = result.post[0]
-        const commentListArray = result.commentList
+        // const commentListArray = result.commentList
 
         console.log(post)
-        console.log(commentListArray)
+        // console.log(commentListArray)
 
         let postTitleDiv = document.createElement('div') 
         let postContentDiv = document.createElement('div') 
@@ -55,32 +60,44 @@
         postContentDiv.innerHTML = post.postcontent
         userIdDiv.innerHTML = post.userid
 
-        if (commentListArray.length == 0) {
-            let commentContentDiv = document.createElement('div') 
-            let commentUserIdIdv = document.createElement('div') 
+        // if (commentListArray.length == 0) {
+        //     let commentContentDiv = document.createElement('div') 
+        //     let commentUserIdIdv = document.createElement('div') 
 
-            document.getElementById("comment_list_container").appendChild(commentContentDiv)
-            document.getElementById("comment_list_container").appendChild(commentUserIdIdv)
+        //     document.getElementById("comment_list_container").appendChild(commentContentDiv)
+        //     document.getElementById("comment_list_container").appendChild(commentUserIdIdv)
 
-            commentContentDiv.innerHTML = "댓글이 없습니다."
-        } else {
-            for (var index = 0; index < commentListArray.length; index++) {
-                let commentContentDiv = document.createElement('div') 
-                let commentUserIdIdv = document.createElement('div') 
+        //     commentContentDiv.innerHTML = "댓글이 없습니다."
+        // } else {
+        //     for (var index = 0; index < commentListArray.length; index++) {
+        //         let commentContentDiv = document.createElement('div') 
+        //         let commentUserIdIdv = document.createElement('div') 
 
-                document.getElementById("post_content").appendChild(postTitleDiv)
-                document.getElementById("post_content").appendChild(postContentDiv)
-                document.getElementById("post_content").appendChild(userIdDiv)
+        //         document.getElementById("post_content").appendChild(postTitleDiv)
+        //         document.getElementById("post_content").appendChild(postContentDiv)
+        //         document.getElementById("post_content").appendChild(userIdDiv)
 
-                document.getElementById("comment_list_container").appendChild(commentContentDiv)
-                document.getElementById("comment_list_container").appendChild(commentUserIdIdv)
+        //         document.getElementById("comment_list_container").appendChild(commentContentDiv)
+        //         document.getElementById("comment_list_container").appendChild(commentUserIdIdv)
 
-                commentContentDiv.innerHTML = commentListArray[index].commentcontent
-                commentUserIdIdv.innerHTML = commentListArray[index].userid
-            }
-        }
+        //         commentContentDiv.innerHTML = commentListArray[index].commentcontent
+        //         commentUserIdIdv.innerHTML = commentListArray[index].userid
+        //     }
+        // }
     }
 
-    getPostEvent()    
+    const getPostNum = async () => {
+        const response = await fetch("/postPage-postNum", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }) 
+        const postNumParameter = await response.json()
+        postNum = postNumParameter
+    }
+    
+    getPostNum()   
+    getPostEvent() 
 </script>
 </html>

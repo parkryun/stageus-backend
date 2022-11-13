@@ -59,7 +59,13 @@
                 postNameTd.innerHTML = postListArray[index].userid    // 나중에 유저네임으로 가져와
                 postDateTd.innerHTML = postListArray[index].postdate
 
-                }
+
+                postTitleTd.addEventListener("click", function async()  {
+                    console.log(postNumTd.innerHTML)
+
+                    location.href = `/postPage?postNum=${postNumTd.innerHTML}`
+                })
+            }
         }
     }
 
