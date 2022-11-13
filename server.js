@@ -3,20 +3,19 @@ const path = require("path")
 const session = require('express-session')
 const Memorystore = require('memorystore')(session)
 const app = express() //express 문법 사용한다고 // import한걸 가져오는거
-
+// ==============라우터 
 const postApi = require("./router/post")
 const findApi = require("./router/find")
 const pagesApi = require("./router/pages")
 const accountApi = require("./router/account")
+// ==============로깅
 const logger = require("./config/winston") // 로그
-const morgan = require("morgan") // morgan 모듈
-const combined = ':remote-addr - :remote-user ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"'
-const morganFormat = process.env.NODE_ENV !== "production" ? "dev" : combined
+const morganMiddleware = require("./config/morganMiddleware")
+app.use(morganMiddleware)
 
 const port = 3000
 
 const maxAge = 1000 * 60 * 5 // 5분 설정
-
 const sessionObj = {
     secret: "wegf6124@#$@#!",  // 암호화를 할 때 필요한 요소값 쿠키 변조 방지
     resave: false, // 변경사항 없어도 항상 저장할건지
@@ -35,7 +34,6 @@ app.use('/post', postApi)
 app.use('/find', findApi)
 app.use('/', pagesApi)
 app.use('/account', accountApi)
-app.use(morgan('dev'))
 
 app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다 여기), response(백엔드에서 보내줄거) 다 오브젝트 형태로옴, 주소3000/mainpage이런거임
     res.sendFile(path.join(__dirname, "../mainPage.html"))   // js는 무조건 절대경로로 가져오는데 __dirname은 뒤에 파일 이름을 찾아서 가져옴 이게 api야 가져오는거 보내주는거
@@ -43,10 +41,7 @@ app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다
 })
 
 app.get("/test", (req, res) => {
-    logger.info('test')
-    res.status(200).send({
-        message: "info test"
-    })
+    console.log(morganMiddleware)
 })
 
 app.listen(port, () => {    // listen은 이 Js를 구동하면 실행하는 것 매개변수를 받고 실행
