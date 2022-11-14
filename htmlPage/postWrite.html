@@ -24,7 +24,7 @@
     let userId = ""
 
     const getsession = async () => {
-        const response = await fetch("/post-write-session", {
+        const response = await fetch("/post-list-session", {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json"
@@ -43,7 +43,7 @@
     }
 
     const PostEvent = async () => {
-        const response = await fetch("/post/", {
+        const response = await fetch("/post/write", {
             method: "POST", 
             headers: {
                 "Content-Type": "application/json"

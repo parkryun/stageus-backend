@@ -1,19 +1,31 @@
 const router = require("express").Router()
 const clientOption = require("./client")
+const dateTime = require("./date") // date
+const mongoClientOption = require("./mongoClient") //mongodbClient
+const mongoClient = require("mongodb").MongoClient
 const { Client } = require("pg") 
+const requestIp = require("request-ip")
 
 // 아이디 찾기
 router.post("/id", async (req, res) => {
 
+    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
         "id": ""
     }
+    const request = {
+        "name": idValue,
+        "email": pwValue
+    }
+
     const client = new Client(clientOption)
     
     const nameValue = req.body.name_value
     const emailValue = req.body.email_value
+    request.name = nameValue
+    request.email = emailValue
 
     if (nameValue == '' || emailValue == '') { // null값 예외처리
         result.message = "작성해주세요"
@@ -37,6 +49,24 @@ router.post("/id", async (req, res) => {
                 if (row[0].email == emailValue) { // 이메일 일치 예외처리
                     result.success = true
                     result.id = row[0].id // 아이디 넘겨주기
+
+                    //======================MongoDB
+                    const database = await mongoClient.connect(mongoClientOption, {
+                        useNewUrlParser: true,
+                        useUnifiedTopology: true
+                    })
+                    const data = {
+                        "user_ip": requestIp.getClientIp(req),
+                        "user_id": user,
+                        "api": "find/id",
+                        "api_rest": "post",
+                        "api_time": dateTime,
+                        "req_res": [request, result],
+                    }
+
+                    await database.db("stageus").collection("logging").insertOne(data)
+                    database.close() // 이거는 종료하는거 꼭 넣어줘야함
+
                 } else {
                     result.message = `회원정보가 정확하지 않습니다.`
                 }
@@ -54,14 +84,22 @@ router.post("/id", async (req, res) => {
 // 비밀번호 찾기
 router.post("/pw", async (req, res) => {
 
+    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
     }
+    const request = {
+        "id": idValue,
+        "email": pwValue
+    }
+
     const client = new Client(clientOption)
         
     const idValue = req.body.id_value
     const emailValue = req.body.email_value
+    request.id = idValue
+    request.email = emailValue
 
     if (idValue == '' || emailValue == '') { // null값 예외처리
         result.message = "작성해주세요"
@@ -88,6 +126,24 @@ router.post("/pw", async (req, res) => {
                     } // 세션으로 아이디 넘기고
         
                     result.success = true
+
+                    //======================MongoDB
+                    const database = await mongoClient.connect(mongoClientOption, {
+                        useNewUrlParser: true,
+                        useUnifiedTopology: true
+                    })
+                    const data = {
+                        "user_ip": requestIp.getClientIp(req),
+                        "user_id": user,
+                        "api": "find/pw",
+                        "api_rest": "post",
+                        "api_time": dateTime,
+                        "req_res": [request, result],
+                    }
+
+                    await database.db("stageus").collection("logging").insertOne(data)
+                    database.close() // 이거는 종료하는거 꼭 넣어줘야함
+
                 } else {
                     result.message = `회원정보가 정확하지 않습니다.`
                 }
@@ -105,15 +161,24 @@ router.post("/pw", async (req, res) => {
 // 비밀번호 변경
 router.put("/pw", async (req, res) => {
 
+    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
+    }
+    const request = {
+        "id": idValue,
+        "pw": pwValue,
+        "pwcheck": pwValue
     }
     const client = new Client(clientOption)
 
     const pwValue = req.body.pw_value
     const pwCheckValue = req.body.pw_check_value
     const idValue = req.body.id_value
+    request.id = idValue
+    request.pw = pwValue
+    request.pwcheck = pwCheckValue
 
     if (pwValue == '' || pwCheckValue == '' || idValue == undefined) { // null값 예외처리
         result.message = "작성해주세요"
@@ -139,6 +204,24 @@ router.put("/pw", async (req, res) => {
                 req.session.user.destroy() // 세션 지우고
         
                 result.success = true
+
+                //======================MongoDB
+                const database = await mongoClient.connect(mongoClientOption, {
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true
+                })
+                const data = {
+                    "user_ip": requestIp.getClientIp(req),
+                    "user_id": user,
+                    "api": "find/pw",
+                    "api_rest": "put",
+                    "api_time": dateTime,
+                    "req_res": [request, result],
+                }
+
+                await database.db("stageus").collection("logging").insertOne(data)
+                database.close() // 이거는 종료하는거 꼭 넣어줘야함
+
                 res.send(result)
             } catch(err) {
                 result.message = err

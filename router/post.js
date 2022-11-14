@@ -1,9 +1,15 @@
 const router = require("express").Router()
 const clientOption = require("./client")
-const { Client } = require("pg")     
+const dateTime = require("./date") // date
+const mongoClientOption = require("./mongoClient") //mongodbClient
+const mongoClient = require("mongodb").MongoClient
+const { Client } = require("pg")  
+const requestIp = require("request-ip")
 
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
+
+    const user = req.session.user.id
 
     const result = {
         "success": false,
@@ -16,13 +22,31 @@ router.get("/list", async (req, res) => {
     try {
         await client.connect() // await 붙여주는
         
-        const sql = 'SELECT * FROM backend.post;'
+        const sql = 'SELECT * FROM backend.post ORDER BY postdate DESC;'
         
         const data = await client.query(sql)
         const row = data.rows
 
         if (row.length > 0) {
             result.postList.push(row)
+
+            //=============================MongoDB
+            const database = await mongoClient.connect(mongoClientOption, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            })
+            const data = {
+                "user_ip": requestIp.getClientIp(req),
+                "user_id": user,
+                "api": "post/list",
+                "api_rest": "get",
+                "api_time": dateTime,
+                "req_res": [result]
+            }
+            
+            await database.db("stageus").collection("logging").insertOne(data)
+            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+        
         } else {
             result.message = '게시글이 존재하지 않습니다.'
         }
@@ -43,15 +67,22 @@ router.post("/", async (req, res) => {
         "post": [],
         "commentList": []
     }
+
+    const request = {
+        "postNum": ""
+    }
+    
     const client = new Client(clientOption)
     const postNum = req.body.postNum_value
+    request.postNum = postNum
+
 
     try {
         await client.connect() 
         
         const sql1 = 'SELECT * FROM backend.post WHERE postNum=$1;'
         // const sql2 = 'SELECT * FROM backend.comment WHERE postNum=$1;'
-        const values = postNum
+        const values = [postNum]
 
         const data1 = await client.query(sql1, values) // 게시글 가져오기
         // const data2 = await client.query(sql2, values) // 해당 게시글 댓글 가져오기
@@ -60,11 +91,24 @@ router.post("/", async (req, res) => {
 
         if (row1.length > 0) {
             result.post.push(row1)
-            // if (row2.length > 0) {
-            //     result.commentList.push(row2)
-            // } else {
-                // result.commentList.push("댓글없음")
-            // }
+
+            //=============================MongoDB
+            const database = await mongoClient.connect(mongoClientOption, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            })
+            const data = {
+                "user_ip": requestIp.getClientIp(req),
+                "user_id": user,
+                "api": "post/",
+                "api_rest": "post",
+                "api_time": dateTime,
+                "req_res": [request, result]
+            }
+            
+            await database.db("stageus").collection("logging").insertOne(data)
+            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+
         } else {
             result.message = '해당 게시글이 존재하지 않습니다.'
         }
@@ -77,11 +121,19 @@ router.post("/", async (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/", async (req, res) => {        
+router.post("/write", async (req, res) => {        
     
+    const user = req.session.user.id
+
     const result = {
         "success": false,
         "message": "",
+    }
+
+    const request = {
+        "title": '',
+        "content": '',
+        "id": ''
     }
 
     const client = new Client(clientOption)
@@ -89,6 +141,9 @@ router.post("/", async (req, res) => {
     const postTitleValue = req.body.post_title_value
     const postContentValue = req.body.post_content_value
     const idValue = req.body.id_value
+    request.title = postTitleValue
+    request.content = postContentValue
+    request.id = idValue
 
     if (postTitleValue == '' || postContentValue == '' || idValue == undefined) { // null값 예외처리
         result.message = "제목 또는 내용을 입력하세요"
@@ -109,6 +164,24 @@ router.post("/", async (req, res) => {
 
             result.success = true
             result.message = "작성 완료"
+
+            //=============================MongoDB
+            const database = await mongoClient.connect(mongoClientOption, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            })
+            const data = {
+                "user_ip": requestIp.getClientIp(req),
+                "user_id": user,
+                "api": "post/write",
+                "api_rest": "post",
+                "api_time": dateTime,
+                "req_res": [request, result]
+            }
+            
+            await database.db("stageus").collection("logging").insertOne(data)
+            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+        
             res.send(result)
         } catch(err) { 
             result.message = err.message
@@ -124,11 +197,17 @@ router.put("/", async (req, res) => {
         "success": false,
         "message": "",
     }
+    const request = {
+        "postNum": "",
+        "content": ""
+    }
 
     const client = new Client(clientOption)
 
-    const postNum = req.body.post_num
+    const postNum = req.body.postNum_value
     const postContentValue = req.body.post_content    
+    request.postNum = postNum
+    request.content = postContentValue
 
     if (postContentValue == '' || postNum == undefined) { // null값 예외처리
         result.message = "작성해주세요"
@@ -146,10 +225,29 @@ router.put("/", async (req, res) => {
             const values = [postContentValue, postNum]
     
             await client.query(sql, values)
-    
+
+            result.message = "수정 완료"
+
+            //=============================MongoDB
+            const database = await mongoClient.connect(mongoClientOption, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            })
+            const data = {
+                "user_ip": requestIp.getClientIp(req),
+                "user_id": user,
+                "api": "post/",
+                "api_rest": "put",
+                "api_time": dateTime,
+                "req_res": [request, result]
+            }
+            
+            await database.db("stageus").collection("logging").insertOne(data)
+            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+                    
             res.send(result)
         } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
-            result.message = err
+            result.message = err.message
             res.send(result)
         }
     }
@@ -162,10 +260,13 @@ router.delete("/", async (req, res) => {
         "success": false,
         "message": "",
     }
+    const request = {
+        "postNum": "",
+    }
 
     const client = new Client(clientOption)
-    
-    const postNum = req.body.post_num
+    const postNum = req.body.postNum_value
+    request.postNum = postNum
 
     if (postNum == undefined) { // undefined값 예외처리
         result.message = "게시글이 존재하지 않습니다."
@@ -175,13 +276,32 @@ router.delete("/", async (req, res) => {
             await client.connect()
             
             const sql = 'DELETE FROM backend.post WHERE postNum=$1;' 
-            const values = postNum
+            const values = [postNum]
     
-            await client.query(sql)
-    
+            await client.query(sql, values)
+            
+            result.message = "삭제완료"
+
+            //=============================MongoDB
+            const database = await mongoClient.connect(mongoClientOption, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            })
+            const data = {
+                "user_ip": requestIp.getClientIp(req),
+                "user_id": user,
+                "api": "post/",
+                "api_rest": "delete",
+                "api_time": dateTime,
+                "req_res": [request, result]
+            }
+            
+            await database.db("stageus").collection("logging").insertOne(data)
+            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+                    
             res.send(result)
         } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
-            result.message = err
+            result.message = err.message
             res.send(result)
         }
     }

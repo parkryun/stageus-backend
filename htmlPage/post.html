@@ -10,12 +10,12 @@
     <h1>post</h1>
     <main id="post_container">
         <section id="post_content">
-
+            
         </section>
 
-        <input type="button" id="post_remove_btn">
+        <input type="button" id="post_remove_btn" value="게시글 삭제" onclick="getPostNumDelete()">
 
-        <input type="button" id="post_update_btn">
+        <input type="button" id="post_update_btn" value="게시글 수정" onclick="showUpdateTextarea()">
 
         <section id="comment_list_container">
 
@@ -28,11 +28,81 @@
 
 </body>
 <script>
-    let postNum = ""
+    let postNum = ''
+
+    const getPostNum = () => {
+        fetch("/postPage-postNum", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }) 
+        .then((response) => response.json())
+        .then((result) => {
+            postNum = result
+            fetch("/post", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    postNum_value: postNum
+                })
+            }) 
+            getPostEvent()
+        })
+    }
+
+    const getPostNumDelete = () => {
+        fetch("/postPage-postNum", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }) 
+        .then((response) => response.json())
+        .then((result) => {
+            postNum = result
+            fetch("/post", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    postNum_value: postNum
+                })
+            }) 
+            deletePostEvent()
+        })
+    }
+
+    const getPostNumUpdate = () => {
+        fetch("/postPage-postNum", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }) 
+        .then((response) => response.json())
+        .then((result) => {
+            postNum = result
+            fetch("/post", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    postNum_value: postNum
+                })
+            }) 
+            postUpdateEvent()
+        })
+    }
+
 
     const getPostEvent = async () => {
         const response = await fetch("/post", {
-            method: "GET", 
+            method: "POST", 
             headers: {
                 "Content-Type": "application/json"
             },
@@ -40,25 +110,42 @@
                 postNum_value: postNum
             })
         }) 
-    
+
         const result = await response.json()
         const post = result.post[0]
         // const commentListArray = result.commentList
 
-        console.log(post)
         // console.log(commentListArray)
 
         let postTitleDiv = document.createElement('div') 
         let postContentDiv = document.createElement('div') 
         let userIdDiv = document.createElement('div') 
+        let postContentTextarea = document.createElement('input')
+        let updateBtn = document.createElement('input')
+
+        postContentDiv.id = "contentDiv"
+
+        postContentTextarea.setAttribute('type', 'textarea')
+        postContentTextarea.setAttribute('value', `${post[0].postcontent}`)
+        postContentTextarea.id = 'updateContent'
+
+        updateBtn.setAttribute('type', 'button')
+        updateBtn.setAttribute('value', '수정하기')
+        updateBtn.id ='updateBtn'
+        updateBtn.setAttribute('onclick', "getPostNumUpdate()")
+
+        postContentTextarea.style.visibility = 'hidden'
+        updateBtn.style.visibility = 'hidden'
 
         document.getElementById("post_content").appendChild(postTitleDiv)
         document.getElementById("post_content").appendChild(postContentDiv)
         document.getElementById("post_content").appendChild(userIdDiv)
+        document.getElementById("post_content").appendChild(postContentTextarea)
+        document.getElementById("post_content").appendChild(updateBtn)
 
-        postTitleDiv.innerHTML = post.posttitle
-        postContentDiv.innerHTML = post.postcontent
-        userIdDiv.innerHTML = post.userid
+        postTitleDiv.innerHTML = `제목: ${post[0].posttitle}`
+        postContentDiv.innerHTML = `내용: ${post[0].postcontent}`
+        userIdDiv.innerHTML = `아이디: ${post[0].userid}`
 
         // if (commentListArray.length == 0) {
         //     let commentContentDiv = document.createElement('div') 
@@ -86,18 +173,60 @@
         // }
     }
 
-    const getPostNum = async () => {
-        const response = await fetch("/postPage-postNum", {
-            method: "GET", 
+
+    const deletePostEvent = async () => {
+        const response = await fetch("/post", {
+            method: "DELETE", 
             headers: {
                 "Content-Type": "application/json"
-            }
-        }) 
-        const postNumParameter = await response.json()
-        postNum = postNumParameter
-    }
+            },
+            body: JSON.stringify({
+                postNum_value: postNum
+            })
+        })
     
+        const result = await response.json()
+
+        if (result.success) {
+            alert(result.message)
+            location.href = "/post-list"
+        } else {
+            alert(result.message)
+            console.log(result.message)
+        }
+    }
+
+    const postUpdateEvent = async () => {
+        const response = await fetch("/post", {
+            method: "PUT", 
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                postNum_value: postNum,
+                post_content: document.getElementById("updateContent").value
+            })
+        })
+    
+        const result = await response.json()
+
+        if (result.success) {
+            alert(result.message)
+            location.href = "/post-list"
+        } else {
+            console.log(result.message)
+        }
+    }
+
+    const showUpdateTextarea = () => {
+        document.getElementById("post_remove_btn").style.visibility = 'hidden'
+        document.getElementById("post_update_btn").style.visibility = 'hidden'
+        document.getElementById("contentDiv").style.visibility = 'hidden'
+
+        document.getElementById("updateContent").style.visibility = 'visible'
+        document.getElementById("updateBtn").style.visibility = 'visible'
+    }
+
     getPostNum()   
-    getPostEvent() 
 </script>
 </html>

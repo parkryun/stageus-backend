@@ -80,6 +80,18 @@ router.get("/post-list", (req, res) => {
     res.sendFile(path.join(__dirname, '../htmlPage/postList.html'))
 })
 
+// 게시글 목록 session
+router.get("/post-list-session", (req, res) => {
+    let user = req.session.user
+    if (user) {
+        res.send(user)
+    } else {
+        result.message = "세션없음"
+        console.log(result)
+        res.send(result)
+    }
+})
+
 // 아이디찾기 페이지
 router.get("/find-id", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/findID.html"))
