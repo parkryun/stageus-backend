@@ -35,7 +35,7 @@ router.get("/list", async (req, res) => {
 })
 
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
-router.get("/", async (req, res) => {    
+router.post("/", async (req, res) => {    
     
     const result = {
         "success": false,

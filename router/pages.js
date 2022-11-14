@@ -37,7 +37,7 @@ router.get("/login", (req, res) => {
 // 게시글 보는 페이지
 router.get("/postPage", (req, res) => {
     postNum = req.query.postNum
-    console.log(postNum)
+    // console.log(postNum)
 
     res.sendFile(path.join(__dirname, "../htmlPage/post.html"), postNum)
 })
