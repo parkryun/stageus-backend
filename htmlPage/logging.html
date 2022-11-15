@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>logging</h1>
+    <main id="logging_container">
+        <section id="logging_list_container">
+            <table id="logging_list_table">
+                <tr>
+                    <th></th>
+                    <th>user_ip</th>
+                    <th>user_id</th>
+                    <th>api</th>
+                    <th>api_rest</th>
+                    <th>api_time</th>
+                    <th>req_res</th>
+                </tr>
+            </table>
+        </section>
+    </main>
+</body>
+<script>
+    const getLoggingListEvent = async () => {
+        const response = await fetch("/logging/list", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    
+        const result = await response.json()
+        const loggingArray = result.loggingList[0]
+        console.log(loggingArray.length)
+
+        if (loggingArray.length == 0) {
+            console.log("로그가 없습니다.")
+        } else {
+            for (var index = 0; index < loggingArray.length; index++) {
+
+                let logTr = document.createElement('tr') // logging Tr 
+                let logUserIpTd = document.createElement('td') // user_ip td
+                let logUserIdTd = document.createElement('td') // user_id td
+                let logApiTd = document.createElement('td') // api td
+                let logApiRestTd = document.createElement('td') // api_rest td
+                let logApiTimeTd = document.createElement('td') // api_time td
+                let logReqResTd = document.createElement('td') // req_res td
+
+                logTr.appendChild(logUserIpTd)
+                logTr.appendChild(logUserIdTd)
+                logTr.appendChild(logApiTd)
+                logTr.appendChild(logApiRestTd)
+                logTr.appendChild(logApiTimeTd)
+                logTr.appendChild(logReqResTd)
+
+                document.getElementById("logging_list_container").appendChild(logTr)
+
+                logUserIpTd.innerHTML = loggingArray[index].user_ip
+                logUserIdTd.innerHTML = loggingArray[index].user_id
+                logApiTd.innerHTML = loggingArray[index].api
+                logApiRestTd.innerHTML = loggingArray[index].api_rest
+                logApiTimeTd.innerHTML = loggingArray[index].api_time
+                logReqResTd.innerHTML = `${loggingArray[index].req_res[0]}, ${loggingArray[index].req_res[1]}`
+                
+            }
+        }
+    }    
+
+    getLoggingListEvent()
+</script>
+</html>

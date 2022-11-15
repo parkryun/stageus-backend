@@ -9,15 +9,14 @@ const requestIp = require("request-ip")
 // 아이디 찾기
 router.post("/id", async (req, res) => {
 
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
         "id": ""
     }
     const request = {
-        "name": idValue,
-        "email": pwValue
+        "name": '',
+        "email": ''
     }
 
     const client = new Client(clientOption)
@@ -57,7 +56,7 @@ router.post("/id", async (req, res) => {
                     })
                     const data = {
                         "user_ip": requestIp.getClientIp(req),
-                        "user_id": user,
+                        "user_id": "",
                         "api": "find/id",
                         "api_rest": "post",
                         "api_time": dateTime,
@@ -84,14 +83,13 @@ router.post("/id", async (req, res) => {
 // 비밀번호 찾기
 router.post("/pw", async (req, res) => {
 
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
     }
     const request = {
-        "id": idValue,
-        "email": pwValue
+        "id": '',
+        "email": ''
     }
 
     const client = new Client(clientOption)
@@ -134,7 +132,7 @@ router.post("/pw", async (req, res) => {
                     })
                     const data = {
                         "user_ip": requestIp.getClientIp(req),
-                        "user_id": user,
+                        "user_id": "",
                         "api": "find/pw",
                         "api_rest": "post",
                         "api_time": dateTime,
@@ -161,15 +159,14 @@ router.post("/pw", async (req, res) => {
 // 비밀번호 변경
 router.put("/pw", async (req, res) => {
 
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
     }
     const request = {
-        "id": idValue,
-        "pw": pwValue,
-        "pwcheck": pwValue
+        "id": '',
+        "pw": '',
+        "pwcheck": ''
     }
     const client = new Client(clientOption)
 
@@ -212,7 +209,7 @@ router.put("/pw", async (req, res) => {
                 })
                 const data = {
                     "user_ip": requestIp.getClientIp(req),
-                    "user_id": user,
+                    "user_id": "",
                     "api": "find/pw",
                     "api_rest": "put",
                     "api_time": dateTime,

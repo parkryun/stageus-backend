@@ -8,6 +8,7 @@ const postApi = require("./router/post")
 const findApi = require("./router/find")
 const pagesApi = require("./router/pages")
 const accountApi = require("./router/account")
+const loggingApi = require("./router/logging")
 
 const port = 3000
 
@@ -30,6 +31,7 @@ app.use('/post', postApi)
 app.use('/find', findApi)
 app.use('/', pagesApi)
 app.use('/account', accountApi)
+app.use('/logging', loggingApi)
 
 app.get("/mainPage", (req, res) => {    // request(프론트에서 오는거 다 여기), response(백엔드에서 보내줄거) 다 오브젝트 형태로옴, 주소3000/mainpage이런거임
     res.sendFile(path.join(__dirname, "../mainPage.html"))   // js는 무조건 절대경로로 가져오는데 __dirname은 뒤에 파일 이름을 찾아서 가져옴 이게 api야 가져오는거 보내주는거

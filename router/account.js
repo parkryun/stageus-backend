@@ -16,48 +16,18 @@ router.post("/login", async (req, res) => {
         "success": false,
         "message": "",
     }
-
-    const request = {   // 몽고 디비 req 삽입용
-        "id": "" 
+    const request = {
+        "id": "",
+        "pw": ""
     }
 
     const client = new Client(clientOption)
 
     const idValue = req.body.id_value
     const pwValue = req.body.pw_value
-
     request.id = idValue
+    request.pw = pwValue
 
-    // if (idValue = '' || pwValue = '') { // null값 예외처리
-    //     result.message = ""
-    // }
-
-    // // PostgreSQL 연결 (callback)
-    // client.connect((err) => { // 이게 비동기함수 client.
-    //     if(err) {   // error가 발생
-    //         result.message = "DB 연결에 오류가 있습니다."
-    //         res.send(result)
-    //     } else {      // error가 발생x
-    //         const sql = "SELECT * FROM backend.account WHERE id=$1 and pw=$2;" // ? 대신 $로 대체 
-    //         const values = [idValue, pwValue]  // value값들을 넣어서
-    //         client.query(sql, values, (err, data) => {
-    //             if (err) {  // sql 에러 발생
-    //                 result.message = "SQL문이 잘못되었습니다."
-    //                 res.send(result)
-    //             } else {    // sql 에러 발생x
-    //                 const row = data.rows
-    //                 if (row.lenth > 0) {
-    //                     result.success = true
-    //                 }
-    //                 res.send(result)
-    //             }
-    //         })
-    //     }
-    //     // res.send(result) // 반환 이게 callback 방식
-    // })
-    // // res.send(result)
-
-    // PostgreSQL 연결 ( async-await ) await이 포함되어있는 함수의 시작 부분에 async를 붙여줘야해
     if (idValue == '' || pwValue == '') { // null값 예외처리
         result.message = "작성해주세요"
         return res.send(result)
@@ -80,8 +50,8 @@ router.post("/login", async (req, res) => {
                 if (pwValue == row[0].pw) { // 비밀번호 일치 예외처리
                     result.success = true // 로그인 성공
                     result.message = "로그인 성공"
-                    
-                    req.session.user.id = {
+
+                    req.session.user = {
                         id: row[0].id,
                         name: row[0].name,
                         email: row[0].email
@@ -98,20 +68,21 @@ router.post("/login", async (req, res) => {
                         "api": "account/login",
                         "api_rest": "post",
                         "api_time": dateTime,
-                        "req_res": [request, result],
+                        "req_res": [result]
                     }
                     await database.db("stageus").collection("logging").insertOne(data)
                     database.close() // 이거는 종료하는거 꼭 넣어줘야함
 
                 } else {
-                    result.message = `비밀번호가 일치하지 않습니다.`
+                    result.message = '비밀번호가 일치하지 않습니다.'
                 }
             } else {
                 result.message = '회원이 존재하지 않습니다.'
             }
             res.send(result)   
         } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
-            result.message = err
+            result.message = err.message
+            console.log(result.message)
             res.send(result)
         }
     }
@@ -127,6 +98,8 @@ router.get("/logout", async (req, res) => {
         "success": false,
         "message": "",
     }
+    const request = {}
+
 
     req.session.destroy()
     //=============================MongoDB
@@ -141,7 +114,7 @@ router.get("/logout", async (req, res) => {
             "api": "account/logout",
             "api_rest": "get",
             "api_time": dateTime,
-            "req_res": [result]
+            "req_res": [request, result]
         }
         
         await database.db("stageus").collection("logging").insertOne(data)
@@ -157,8 +130,6 @@ router.get("/logout", async (req, res) => {
 
 // 이것도 post 회원가입
 router.post("/", async (req, res) => {
-
-    const user = req.session.user.id
 
     const result = {
         "success": false,
@@ -202,7 +173,7 @@ router.post("/", async (req, res) => {
             })
             const data = {
                 "user_ip": requestIp.getClientIp(req),
-                "user_id": user,
+                "user_id": "",
                 "api": "account/",
                 "api_rest": "post",
                 "api_time": dateTime,

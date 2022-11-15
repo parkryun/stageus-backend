@@ -15,6 +15,7 @@
 
     <section id="post_list_location_container">
         <a href="/post-list">게시물 보기</a>
+        <a href="/loggingPage" id="loggingPageHref" style="visibility: hidden;">로깅 보기</a>
     </section>
 </body>
 <script>
@@ -36,6 +37,10 @@
             userId = user.id
             
             document.getElementById("p_id").innerHTML = `${user.name}님 안녕하세요!`
+        }
+
+        if (user.id == "manager") {
+            document.getElementById("loggingPageHref").style.visibility = "visible"
         }
     }
 

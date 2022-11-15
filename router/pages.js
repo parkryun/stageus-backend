@@ -16,6 +16,12 @@ router.get("/main", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/mainPage.html"))
 })
 
+// logging Page
+router.get("/loggingPage", (req, res) => {
+    // res.sendFile(__dirname + "../htmlPage/mainPage.html")
+    res.sendFile(path.join(__dirname, "../htmlPage/logging.html"))
+})
+
 // get mainpage session
 router.get("/main-session", (req, res) => {
     // res.sendFile(__dirname + "../htmlPage/mainPage.html")

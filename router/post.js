@@ -10,12 +10,12 @@ const requestIp = require("request-ip")
 router.get("/list", async (req, res) => {  
 
     const user = req.session.user.id
-
     const result = {
         "success": false,
         "message": "",
         "postList": []
     }
+    const request = {}
 
     const client = new Client(clientOption)
 
@@ -41,7 +41,7 @@ router.get("/list", async (req, res) => {
                 "api": "post/list",
                 "api_rest": "get",
                 "api_time": dateTime,
-                "req_res": [result]
+                "req_res": [request, result]
             }
             
             await database.db("stageus").collection("logging").insertOne(data)
@@ -61,6 +61,7 @@ router.get("/list", async (req, res) => {
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
 router.post("/", async (req, res) => {    
     
+    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
@@ -124,7 +125,6 @@ router.post("/", async (req, res) => {
 router.post("/write", async (req, res) => {        
     
     const user = req.session.user.id
-
     const result = {
         "success": false,
         "message": "",
@@ -193,6 +193,7 @@ router.post("/write", async (req, res) => {
 // 게시글 수정api 
 router.put("/", async (req, res) => {
 
+    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
@@ -256,6 +257,7 @@ router.put("/", async (req, res) => {
 // 게시글 삭제api
 router.delete("/", async (req, res) => {    
 
+    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
