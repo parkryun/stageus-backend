@@ -18,7 +18,14 @@ router.get("/main", (req, res) => {
 
 // logging Page
 router.get("/loggingPage", (req, res) => {
-    // res.sendFile(__dirname + "../htmlPage/mainPage.html")
+
+    const user = req.session.user.id
+
+    if (user == undefined) { // 세션 예외처리
+        
+        res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
+    }
+
     res.sendFile(path.join(__dirname, "../htmlPage/logging.html"))
 })
 

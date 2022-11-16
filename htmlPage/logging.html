@@ -9,22 +9,31 @@
 <body>
     <h1>logging</h1>
     <main id="logging_container">
-        <section id="logging_list_container">
-            <table id="logging_list_table">
-                <tr>
-                    <th></th>
-                    <th>user_ip</th>
-                    <th>user_id</th>
-                    <th>api</th>
-                    <th>api_rest</th>
-                    <th>api_time</th>
-                    <th>req_res</th>
-                </tr>
-            </table>
+        <section id="log_filter_container">
+            <input type='checkbox' id='log_reverse_filter'>역순
+            <select id="log_filter">
+                <option value="user_id">user_id</option>
+                <option value="api">api</option>
+            </select>
+            <input type="text" value="입력" id="log_filter_content">
+            <input type="button" value="검색하기" id="log_filter_btn" onclick="getLoggingFilterEvent()">
+
+            <!-- 날짜범위 -->
+            <input type="date" id="logging_start_date">
+            <input type="date" id="logging_end_date">
+            <input type="button" value="날짜검색하기" id="log_date_filter_btn" onclick="getLoggingDateFilterEvent()">
+
         </section>
+        <input type="button" value="순서" id="log_sequence_btn" onclick="">
+        <section id="logging_list_container">
+
+        </section>
+        
     </main>
 </body>
+
 <script>
+
     const getLoggingListEvent = async () => {
         const response = await fetch("/logging/list", {
             method: "GET", 
@@ -40,8 +49,11 @@
         if (loggingArray.length == 0) {
             console.log("로그가 없습니다.")
         } else {
-            for (var index = 0; index < loggingArray.length; index++) {
+            let logTable = document.createElement('table') // logging Tr 
+            logTable.id = "logging_list_table"
+            document.getElementById("logging_list_container").appendChild(logTable)
 
+            for (var index = 0; index < loggingArray.length; index++) {
                 let logTr = document.createElement('tr') // logging Tr 
                 let logUserIpTd = document.createElement('td') // user_ip td
                 let logUserIdTd = document.createElement('td') // user_id td
@@ -57,9 +69,9 @@
                 logTr.appendChild(logApiTimeTd)
                 logTr.appendChild(logReqResTd)
 
-                document.getElementById("logging_list_container").appendChild(logTr)
+                logTable.appendChild(logTr)
 
-                logUserIpTd.innerHTML = loggingArray[index].user_ip
+                logUserIpTd.innerHTML = `${loggingArray[index].user_ip}   `
                 logUserIdTd.innerHTML = loggingArray[index].user_id
                 logApiTd.innerHTML = loggingArray[index].api
                 logApiRestTd.innerHTML = loggingArray[index].api_rest
@@ -69,6 +81,149 @@
             }
         }
     }    
+    
+    const getLoggingFilterEvent = async () => {
+        const filterContent = document.getElementById("log_filter_content").value
+        const filterOption = document.getElementById("log_filter").value
+        const filterReverse = document.getElementById("log_reverse_filter")
+        let filterContentValue = ""
+        let filterOptionValue = ""
+        
+        if (filterContent == "" || filterContent == null) {
+            alert("입력해주세요")
+        } else {
+            filterContentValue = filterContent // 필터링할 내용
+
+            if(filterOption == "user_id") { // 필터링할 옵션
+                filterOptionValue = filterOption
+            } else { // api겠지?
+                filterOptionValue = filterOption
+            }
+
+            const response = await fetch("/logging/list-filter", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    filter_content_value: filterContentValue,
+                    filter_option_value: filterOptionValue,
+                    filter_reverse_value: filterReverse.checked
+                })
+            })
+    
+            const result = await response.json()
+            const loggingArray = result.loggingList[0]
+            console.log(loggingArray.length)
+            
+            const loggingListTable = document.getElementById("logging_list_table")
+            loggingListTable.remove()
+
+            if (loggingArray.length == 0) {
+                console.log("로그가 없습니다.")
+            } else {
+                let logTable = document.createElement('table') // logging Tr 
+                logTable.id = "logging_list_table"
+                document.getElementById("logging_list_container").appendChild(logTable)
+
+                for (var index = 0; index < loggingArray.length; index++) {
+
+                    let logTr = document.createElement('tr') // logging Tr 
+                    let logUserIpTd = document.createElement('td') // user_ip td
+                    let logUserIdTd = document.createElement('td') // user_id td
+                    let logApiTd = document.createElement('td') // api td
+                    let logApiRestTd = document.createElement('td') // api_rest td
+                    let logApiTimeTd = document.createElement('td') // api_time td
+                    let logReqResTd = document.createElement('td') // req_res td
+
+                    logTr.appendChild(logUserIpTd)
+                    logTr.appendChild(logUserIdTd)
+                    logTr.appendChild(logApiTd)
+                    logTr.appendChild(logApiRestTd)
+                    logTr.appendChild(logApiTimeTd)
+                    logTr.appendChild(logReqResTd)
+
+                    logTable.appendChild(logTr)
+            
+                    logUserIpTd.innerHTML = loggingArray[index].user_ip
+                    logUserIdTd.innerHTML = loggingArray[index].user_id
+                    logApiTd.innerHTML = loggingArray[index].api
+                    logApiRestTd.innerHTML = loggingArray[index].api_rest
+                    logApiTimeTd.innerHTML = loggingArray[index].api_time
+                    logReqResTd.innerHTML = `${loggingArray[index].req_res[0]}, ${loggingArray[index].req_res[1]}`
+                }
+            }
+        }
+    }
+
+    const getLoggingDateFilterEvent = async () => {
+        const startDate = document.getElementById("logging_start_date").value
+        const endDate = document.getElementById("logging_end_date").value
+        const filterReverse = document.getElementById("log_reverse_filter")
+        let startDateValue = ""
+        let endDateValue = ""
+        
+        if (startDate == "" || startDate == null || endDate == "" || endDate == null) {
+            alert("입력해주세요")
+        } else {
+            startDateValue = startDate // 필터링할 내용
+            endDateValue = endDate // 필터링할 내용
+
+            const response = await fetch("/logging/list-date-filter", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    start_date_value: startDateValue,
+                    end_date_value: endDateValue,
+                    filter_reverse_value: filterReverse.checked
+                })
+            })
+    
+            const result = await response.json()
+            const loggingArray = result.loggingList[0]
+            console.log(loggingArray.length)
+            
+            const loggingListTable = document.getElementById("logging_list_table")
+            loggingListTable.remove()
+
+            if (loggingArray.length == 0) {
+                console.log("로그가 없습니다.")
+            } else {
+                let logTable = document.createElement('table') // logging Tr 
+                logTable.id = "logging_list_table"
+                document.getElementById("logging_list_container").appendChild(logTable)
+
+                for (var index = 0; index < loggingArray.length; index++) {
+
+                    let logTr = document.createElement('tr') // logging Tr 
+                    let logUserIpTd = document.createElement('td') // user_ip td
+                    let logUserIdTd = document.createElement('td') // user_id td
+                    let logApiTd = document.createElement('td') // api td
+                    let logApiRestTd = document.createElement('td') // api_rest td
+                    let logApiTimeTd = document.createElement('td') // api_time td
+                    let logReqResTd = document.createElement('td') // req_res td
+
+                    logTr.appendChild(logUserIpTd)
+                    logTr.appendChild(logUserIdTd)
+                    logTr.appendChild(logApiTd)
+                    logTr.appendChild(logApiRestTd)
+                    logTr.appendChild(logApiTimeTd)
+                    logTr.appendChild(logReqResTd)
+
+                    logTable.appendChild(logTr)
+            
+                    logUserIpTd.innerHTML = loggingArray[index].user_ip
+                    logUserIdTd.innerHTML = loggingArray[index].user_id
+                    logApiTd.innerHTML = loggingArray[index].api
+                    logApiRestTd.innerHTML = loggingArray[index].api_rest
+                    logApiTimeTd.innerHTML = loggingArray[index].api_time
+                    logReqResTd.innerHTML = `${loggingArray[index].req_res[0]}, ${loggingArray[index].req_res[1]}`
+                }
+            }
+        }
+    }
 
     getLoggingListEvent()
 </script>

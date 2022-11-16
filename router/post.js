@@ -9,12 +9,18 @@ const requestIp = require("request-ip")
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
 
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
         "postList": []
     }
+    
+    const user = req.session.user.id
+    if (user == undefined) { // 세션 예외처리
+        result.message = "세션없음"   
+        res.send(result)
+    }
+
     const request = {}
 
     const client = new Client(clientOption)
@@ -61,12 +67,16 @@ router.get("/list", async (req, res) => {
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
 router.post("/", async (req, res) => {    
     
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
         "post": [],
         "commentList": []
+    }
+    const user = req.session.user.id
+    if (user == undefined) { // 세션 예외처리
+        result.message = "세션없음"   
+        res.send(result)
     }
 
     const request = {
@@ -124,10 +134,14 @@ router.post("/", async (req, res) => {
 // 게시글 작성 api
 router.post("/write", async (req, res) => {        
     
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
+    }
+    const user = req.session.user.id
+    if (user == undefined) { // 세션 예외처리
+        result.message = "세션없음"   
+        res.send(result)
     }
 
     const request = {
@@ -193,7 +207,6 @@ router.post("/write", async (req, res) => {
 // 게시글 수정api 
 router.put("/", async (req, res) => {
 
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
@@ -201,6 +214,12 @@ router.put("/", async (req, res) => {
     const request = {
         "postNum": "",
         "content": ""
+    }
+
+    const user = req.session.user.id
+    if (user == undefined) { // 세션 예외처리
+        result.message = "세션없음"   
+        res.send(result)
     }
 
     const client = new Client(clientOption)
@@ -257,13 +276,17 @@ router.put("/", async (req, res) => {
 // 게시글 삭제api
 router.delete("/", async (req, res) => {    
 
-    const user = req.session.user.id
     const result = {
         "success": false,
         "message": "",
     }
     const request = {
         "postNum": "",
+    }
+    const user = req.session.user.id
+    if (user == undefined) { // 세션 예외처리
+        result.message = "세션없음"   
+        res.send(result)
     }
 
     const client = new Client(clientOption)
