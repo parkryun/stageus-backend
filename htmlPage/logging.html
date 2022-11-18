@@ -15,7 +15,7 @@
                 <option value="user_id">user_id</option>
                 <option value="api">api</option>
             </select>
-            <input type="text" value="입력" id="log_filter_content">
+            <input type="text" placeholder="입력" id="log_filter_content">
             <input type="button" value="검색하기" id="log_filter_btn" onclick="getLoggingFilterEvent()">
 
             <!-- 날짜범위 -->
@@ -44,7 +44,7 @@
     
         const result = await response.json()
         const loggingArray = result.loggingList[0]
-        console.log(loggingArray.length)
+        
 
         if (loggingArray.length == 0) {
             console.log("로그가 없습니다.")
@@ -52,6 +52,9 @@
             let logTable = document.createElement('table') // logging Tr 
             logTable.id = "logging_list_table"
             document.getElementById("logging_list_container").appendChild(logTable)
+
+            const reqValue = []
+            const resValue = []
 
             for (var index = 0; index < loggingArray.length; index++) {
                 let logTr = document.createElement('tr') // logging Tr 
