@@ -1,7 +1,7 @@
 const router = require("express").Router()
-const clientOption = require("./client")
-const dateTime = require("./date")
-const mongoClientOption = require("./mongoClient")
+const clientOption = require("../config/clientConfig/client")
+const dateTime = require("../config/date") // date
+const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
 const mongoClient = require("mongodb").MongoClient
 const { Client } = require("pg") 
 const requestIp = require("request-ip")
