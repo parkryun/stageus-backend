@@ -1,10 +1,8 @@
 const router = require("express").Router()
 const clientOption = require("../config/clientConfig/client")
-const dateTime = require("../module/date") // date
-const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
-const mongoClient = require("mongodb").MongoClient
 const { Client } = require("pg") 
 const requestIp = require("request-ip")
+const logging = require("../config/loggingConfig") // logging config
 
 // PostgreSQL 기본 설정 ( DB 계정 설정)
 
@@ -57,21 +55,7 @@ router.post("/login", async (req, res) => {
                         email: row[0].email
                     }
                     //=============MongoDB 로깅
-                    
-                    const database = await mongoClient.connect(mongoClientOption, {
-                        useNewUrlParser: true,
-                        useUnifiedTopology: true
-                    })
-                    const data = {
-                        "user_ip": requestIp.getClientIp(req),
-                        "user_id": row[0].id,
-                        "api": "account/login",
-                        "api_rest": "post",
-                        "api_time": dateTime,
-                        "req_res": [result]
-                    }
-                    await database.db("stageus").collection("logging").insertOne(data)
-                    database.close() // 이거는 종료하는거 꼭 넣어줘야함
+                    logging(requestIp.getClientIp(req), "", "account/login", "post", request, result)
 
                 } else {
                     result.message = '비밀번호가 일치하지 않습니다.'
@@ -107,22 +91,9 @@ router.get("/logout", async (req, res) => {
     req.session.destroy()
     //=============================MongoDB
     try {
-        const database = await mongoClient.connect(mongoClientOption, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        })
-        const data = {
-            "user_ip": requestIp.getClientIp(req),
-            "user_id": user,
-            "api": "account/logout",
-            "api_rest": "get",
-            "api_time": dateTime,
-            "req_res": [request, result]
-        }
-        
-        await database.db("stageus").collection("logging").insertOne(data)
-        database.close() // 이거는 종료하는거 꼭 넣어줘야함
-    
+
+        logging(requestIp.getClientIp(req), user, "account/logout", "get", request, result)
+
     } catch {
         result.message = err
         res.send(result)
@@ -170,21 +141,7 @@ router.post("/", async (req, res) => {
     
             await client.query(sql, values)
             //======================MongoDB
-            const database = await mongoClient.connect(mongoClientOption, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            })
-            const data = {
-                "user_ip": requestIp.getClientIp(req),
-                "user_id": "",
-                "api": "account/",
-                "api_rest": "post",
-                "api_time": dateTime,
-                "req_res": [request, result],
-            }
-            
-            await database.db("stageus").collection("logging").insertOne(data)
-            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+            logging(requestIp.getClientIp(req), "", "account/", "post", request, result)
 
             result.success = true
             res.send(result)

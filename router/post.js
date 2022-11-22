@@ -1,11 +1,10 @@
 const router = require("express").Router()
 const clientOption = require("../config/clientConfig/client")
-const dateTime = require("../module/date") // date
-const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
-const mongoClient = require("mongodb").MongoClient
 const { Client } = require("pg")  
 const requestIp = require("request-ip")
-const upload = require('../module/multer');
+const upload = require('../module/multer')
+const logging = require("../config/loggingConfig") // logging config
+
 
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
@@ -38,22 +37,8 @@ router.get("/list", async (req, res) => {
             result.postList.push(row)
 
             //=============================MongoDB
-            const database = await mongoClient.connect(mongoClientOption, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            })
-            const data = {
-                "user_ip": requestIp.getClientIp(req),
-                "user_id": user,
-                "api": "post/list",
-                "api_rest": "get",
-                "api_time": dateTime,
-                "req_res": [request, result]
-            }
-            
-            await database.db("stageus").collection("logging").insertOne(data)
-            database.close() // 이거는 종료하는거 꼭 넣어줘야함
-        
+            logging(requestIp.getClientIp(req), user, "post/list", "get", request, result)
+
         } else {
             result.message = '게시글이 존재하지 않습니다.'
         }
@@ -105,21 +90,7 @@ router.post("/", async (req, res) => {
             result.post.push(row1)
 
             //=============================MongoDB
-            const database = await mongoClient.connect(mongoClientOption, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            })
-            const data = {
-                "user_ip": requestIp.getClientIp(req),
-                "user_id": user,
-                "api": "post/",
-                "api_rest": "post",
-                "api_time": dateTime,
-                "req_res": [request, result]
-            }
-            
-            await database.db("stageus").collection("logging").insertOne(data)
-            database.close() // 이거는 종료하는거 꼭 넣어줘야함
+            logging(requestIp.getClientIp(req), user, "post/", "post", request, result)
 
         } else {
             result.message = '해당 게시글이 존재하지 않습니다.'
@@ -184,22 +155,8 @@ router.post("/write", upload.single('image'), async (req, res) => {
             result.message = "작성 완료"
 
             //=============================MongoDB
-            const database = await mongoClient.connect(mongoClientOption, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            })
-            const data = {
-                "user_ip": requestIp.getClientIp(req),
-                "user_id": user,
-                "api": "post/write",
-                "api_rest": "post",
-                "api_time": dateTime,
-                "req_res": [request, result]
-            }
-            
-            await database.db("stageus").collection("logging").insertOne(data)
-            database.close() // 이거는 종료하는거 꼭 넣어줘야함
-        
+            logging(requestIp.getClientIp(req), user, "post/write", "post", request, result)
+
             res.send(result)
         } catch(err) { 
             result.message = err.message
@@ -253,22 +210,8 @@ router.put("/", async (req, res) => {
             result.message = "수정 완료"
 
             //=============================MongoDB
-            const database = await mongoClient.connect(mongoClientOption, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            })
-            const data = {
-                "user_ip": requestIp.getClientIp(req),
-                "user_id": user,
-                "api": "post/",
-                "api_rest": "put",
-                "api_time": dateTime,
-                "req_res": [request, result]
-            }
-            
-            await database.db("stageus").collection("logging").insertOne(data)
-            database.close() // 이거는 종료하는거 꼭 넣어줘야함
-                    
+            logging(requestIp.getClientIp(req), user, "post/", "put", request, result)
+
             res.send(result)
         } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
             result.message = err.message
@@ -312,22 +255,8 @@ router.delete("/", async (req, res) => {
             result.message = "삭제완료"
 
             //=============================MongoDB
-            const database = await mongoClient.connect(mongoClientOption, {
-                useNewUrlParser: true,
-                useUnifiedTopology: true
-            })
-            const data = {
-                "user_ip": requestIp.getClientIp(req),
-                "user_id": user,
-                "api": "post/",
-                "api_rest": "delete",
-                "api_time": dateTime,
-                "req_res": [request, result]
-            }
-            
-            await database.db("stageus").collection("logging").insertOne(data)
-            database.close() // 이거는 종료하는거 꼭 넣어줘야함
-                    
+            logging(requestIp.getClientIp(req), user, "post/", "delete", request, result)
+
             res.send(result)
         } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
             result.message = err.message

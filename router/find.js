@@ -1,10 +1,9 @@
 const router = require("express").Router()
 const clientOption = require("../config/clientConfig/client")
 const dateTime = require("../module/date") // date
-const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
-const mongoClient = require("mongodb").MongoClient
 const { Client } = require("pg") 
 const requestIp = require("request-ip")
+const logging = require("../config/loggingConfig") // logging config
 
 // 아이디 찾기
 router.post("/id", async (req, res) => {
@@ -50,21 +49,7 @@ router.post("/id", async (req, res) => {
                     result.id = row[0].id // 아이디 넘겨주기
 
                     //======================MongoDB
-                    const database = await mongoClient.connect(mongoClientOption, {
-                        useNewUrlParser: true,
-                        useUnifiedTopology: true
-                    })
-                    const data = {
-                        "user_ip": requestIp.getClientIp(req),
-                        "user_id": "",
-                        "api": "find/id",
-                        "api_rest": "post",
-                        "api_time": dateTime,
-                        "req_res": [request, result],
-                    }
-
-                    await database.db("stageus").collection("logging").insertOne(data)
-                    database.close() // 이거는 종료하는거 꼭 넣어줘야함
+                    logging(requestIp.getClientIp(req), "", "find/id", "post", request, result)
 
                 } else {
                     result.message = `회원정보가 정확하지 않습니다.`
@@ -126,21 +111,7 @@ router.post("/pw", async (req, res) => {
                     result.success = true
 
                     //======================MongoDB
-                    const database = await mongoClient.connect(mongoClientOption, {
-                        useNewUrlParser: true,
-                        useUnifiedTopology: true
-                    })
-                    const data = {
-                        "user_ip": requestIp.getClientIp(req),
-                        "user_id": "",
-                        "api": "find/pw",
-                        "api_rest": "post",
-                        "api_time": dateTime,
-                        "req_res": [request, result],
-                    }
-
-                    await database.db("stageus").collection("logging").insertOne(data)
-                    database.close() // 이거는 종료하는거 꼭 넣어줘야함
+                    logging(requestIp.getClientIp(req), "", "find/pw", "post", request, result)
 
                 } else {
                     result.message = `회원정보가 정확하지 않습니다.`
@@ -203,21 +174,7 @@ router.put("/pw", async (req, res) => {
                 result.success = true
 
                 //======================MongoDB
-                const database = await mongoClient.connect(mongoClientOption, {
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true
-                })
-                const data = {
-                    "user_ip": requestIp.getClientIp(req),
-                    "user_id": "",
-                    "api": "find/pw",
-                    "api_rest": "put",
-                    "api_time": dateTime,
-                    "req_res": [request, result],
-                }
-
-                await database.db("stageus").collection("logging").insertOne(data)
-                database.close() // 이거는 종료하는거 꼭 넣어줘야함
+                logging(requestIp.getClientIp(req), "", "find/pw", "put", request, result)
 
                 res.send(result)
             } catch(err) {
