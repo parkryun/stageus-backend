@@ -73,6 +73,7 @@
                 })
             }) 
             deletePostEvent()
+            location.href = "/post-list"
         })
     }
 
@@ -115,7 +116,7 @@
         // const commentListArray = result.commentList
 
         // img 있을 때
-        if(post[0].postimgurl != '' || post[0].postimgurl != undefined) {
+        if(post[0].postimgurl != '' || post[0].postimgurl != null) {
             let postImg = document.createElement('img')
             postImg.setAttribute("src", post[0].postimgurl)
             document.getElementById("post_content").appendChild(postImg)
@@ -193,7 +194,6 @@
 
         if (result.success) {
             alert(result.message)
-            location.href = "/post-list"
         } else {
             alert(result.message)
             console.log(result.message)
