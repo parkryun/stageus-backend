@@ -1,5 +1,5 @@
 const router = require("express").Router()
-const mongoClientOption = require("./mongoClient") //mongodbClient
+const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
 const mongoClient = require("mongodb").MongoClient
 
 router.get("/list", async (req, res) => {

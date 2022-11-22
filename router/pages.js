@@ -1,6 +1,6 @@
 const router = require("express").Router() 
 const path = require("path")
-const clientOption = require("./client")
+const clientOption = require("../config/clientConfig/client")
 
 const result = {
     "success": false,

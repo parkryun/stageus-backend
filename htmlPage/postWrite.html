@@ -12,7 +12,7 @@
         <section id="post_write_content">
             <input type="text" placeholder="제목" id="post_write_input_title">
             <input type="textarea" placeholder="내용" id="post_write_input_content">
-            <input type="file" id="post_write_input_file">
+            <input type="file" id="post_write_input_file" accept="image/*"> 
         </section>
 
         <section id="post_write_btn_container">
@@ -33,7 +33,6 @@
         })
     
         let user = await response.json()
-        console.log(user)
         
         if(user.message == '세션없음') { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
@@ -44,16 +43,23 @@
     }
 
     const PostEvent = async () => {
+
+        const inputImage = document.getElementById('post_write_input_file').files[0]
+        const postTitleValue = document.getElementById("post_write_input_title").value
+        const postContentValue = document.getElementById("post_write_input_content").value
+        const form = new FormData()
+
+        form.enctype = "nultipart/form-data"
+        // postTitleValue.enctype = "application/json"
+        // postContentValue.enctype = "application/json"
+
+        form.append('image', inputImage)
+        form.append('postTitleValue', postTitleValue)
+        form.append('postContentValue', postContentValue)
+
         const response = await fetch("/post/write", {
-            method: "POST", 
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                post_title_value: document.getElementById("post_write_input_title").value,
-                post_content_value: document.getElementById("post_write_input_content").value,
-                id_value : userId
-            })
+            method: "POST",             
+            body: form
         })
     
         const result = await response.json()

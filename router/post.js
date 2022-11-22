@@ -1,10 +1,11 @@
 const router = require("express").Router()
-const clientOption = require("./client")
-const dateTime = require("./date") // date
-const mongoClientOption = require("./mongoClient") //mongodbClient
+const clientOption = require("../config/clientConfig/client")
+const dateTime = require("../module/date") // date
+const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
 const mongoClient = require("mongodb").MongoClient
 const { Client } = require("pg")  
 const requestIp = require("request-ip")
+const upload = require('../module/multer');
 
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
@@ -132,8 +133,9 @@ router.post("/", async (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/write", async (req, res) => {        
+router.post("/write", upload.single('image'), async (req, res) => {        
     
+    // image location이랑 originalname 을 db에 저장하고 나중에 불러올 때 이거 가져와야지
     const result = {
         "success": false,
         "message": "",
@@ -152,9 +154,11 @@ router.post("/write", async (req, res) => {
 
     const client = new Client(clientOption)
 
-    const postTitleValue = req.body.post_title_value
-    const postContentValue = req.body.post_content_value
-    const idValue = req.body.id_value
+    const postTitleValue = req.body.postTitleValue
+    const postContentValue = req.body.postContentValue
+    const postImgUrl = req.file.location
+    const idValue = user
+
     request.title = postTitleValue
     request.content = postContentValue
     request.id = idValue
@@ -171,8 +175,8 @@ router.post("/write", async (req, res) => {
         try {
             await client.connect()
             
-            const sql = 'INSERT INTO backend.post (postTitle, postContent, userId) VALUES ($1, $2, $3);'
-            const values = [postTitleValue, postContentValue, idValue]
+            const sql = 'INSERT INTO backend.post (postTitle, postContent, userId, postImgUrl) VALUES ($1, $2, $3, $4);'
+            const values = [postTitleValue, postContentValue, idValue, postImgUrl]
             
             await client.query(sql, values)
 

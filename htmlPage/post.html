@@ -99,7 +99,6 @@
         })
     }
 
-
     const getPostEvent = async () => {
         const response = await fetch("/post", {
             method: "POST", 
@@ -115,7 +114,12 @@
         const post = result.post[0]
         // const commentListArray = result.commentList
 
-        // console.log(commentListArray)
+        // img 있을 때
+        if(post[0].postimgurl != '' || post[0].postimgurl != undefined) {
+            let postImg = document.createElement('img')
+            postImg.setAttribute("src", post[0].postimgurl)
+            document.getElementById("post_content").appendChild(postImg)
+        }
 
         let postTitleDiv = document.createElement('div') 
         let postContentDiv = document.createElement('div') 
