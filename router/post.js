@@ -124,20 +124,28 @@ router.post("/write", upload.single('image'), async (req, res) => {
     }
 
     const client = new Client(clientOption)
-
-
     
     const postTitleValue = req.body.postTitleValue
     const postContentValue = req.body.postContentValue
     const idValue = user
     let postImgUrl = ""
-
-    request.title = postTitleValue
-    request.content = postContentValue
+    
     request.id = idValue
 
-    if(req.file != undefined) { // 이미지 파일 없을 때 예외처리
+    console.log(req.file.mimetype.split('/')[1])
+
+    if (req.file != undefined) { // 이미지 파일 없을 때 예외처리
+    
+        const imgType = req.file.mimetype.split('/')[1]
         postImgUrl = req.file.location
+
+        if (req.file.size > 5 * 1024 * 1024) {  // 크기 예외처리
+            result.message = "파일의 크기가 너무 큽니다."
+            return res.send(result)
+        } else if (imgType != "jpg" && imgType != "png" && imgType != "jpeg") { // 확장자 예외처리
+            result.message = "파일 형식이 맞지 않습니다."
+            return res.send(result)
+        }
     }
 
     if (postTitleValue == '' || postContentValue == '' || idValue == undefined) { // null값 예외처리

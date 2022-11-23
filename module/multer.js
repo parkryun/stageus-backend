@@ -17,6 +17,24 @@ const storage = multerS3({
     }
 })
 
-const upload = multer({storage: storage})
+const fileFilter = (req, file, callback) => {
+    const imgType = file.mimetype.split('/')[1]
+
+    if (imgType == 'jpg' || imgType == 'png' || imgType == 'jpeg') {
+        callback(null, true)
+    } else {
+        callback(null, false)
+    }
+}
+
+const upload = multer({
+    storage: storage,
+    fileFilter: fileFilter,
+    limits: {   // 이미지 크기, 개수 제한 
+        fileSize: 5 * 1024 * 1024,  // 5mb로 제한
+        files: 5
+    }
+
+})
 
 module.exports = upload
