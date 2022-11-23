@@ -63,23 +63,29 @@
                 let logApiTd = document.createElement('td') // api td
                 let logApiRestTd = document.createElement('td') // api_rest td
                 let logApiTimeTd = document.createElement('td') // api_time td
-                let logReqResTd = document.createElement('td') // req_res td
+                let logReqPre = document.createElement('pre') // req_res td
+                let logResPre = document.createElement('pre') // req_res td
 
                 logTr.appendChild(logUserIpTd)
                 logTr.appendChild(logUserIdTd)
                 logTr.appendChild(logApiTd)
                 logTr.appendChild(logApiRestTd)
                 logTr.appendChild(logApiTimeTd)
-                logTr.appendChild(logReqResTd)
+                logTr.appendChild(logReqPre)
+                logTr.appendChild(logResPre)
 
                 logTable.appendChild(logTr)
+
+                let logReqString = JSON.stringify(loggingArray[index].req)
+                let logResString = JSON.stringify(loggingArray[index].res)
 
                 logUserIpTd.innerHTML = `${loggingArray[index].user_ip}   `
                 logUserIdTd.innerHTML = loggingArray[index].user_id
                 logApiTd.innerHTML = loggingArray[index].api
                 logApiRestTd.innerHTML = loggingArray[index].api_rest
                 logApiTimeTd.innerHTML = loggingArray[index].api_time
-                logReqResTd.innerHTML = `${loggingArray[index].req_res[0]}, ${loggingArray[index].req_res[1]}`
+                logReqPre.innerHTML = logReqString
+                logResPre.innerHTML = logResString
                 
             }
         }

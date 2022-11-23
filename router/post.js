@@ -125,14 +125,20 @@ router.post("/write", upload.single('image'), async (req, res) => {
 
     const client = new Client(clientOption)
 
+
+    
     const postTitleValue = req.body.postTitleValue
     const postContentValue = req.body.postContentValue
-    const postImgUrl = req.file.location
     const idValue = user
+    let postImgUrl = ""
 
     request.title = postTitleValue
     request.content = postContentValue
     request.id = idValue
+
+    if(req.file != undefined) { // 이미지 파일 없을 때 예외처리
+        postImgUrl = req.file.location
+    }
 
     if (postTitleValue == '' || postContentValue == '' || idValue == undefined) { // null값 예외처리
         result.message = "제목 또는 내용을 입력하세요"

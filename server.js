@@ -12,7 +12,7 @@ const loggingApi = require("./router/logging")
 
 const port = 3000
 
-const maxAge = 1000 * 60 * 5 // 5분 설정
+const maxAge = 1000 * 60 * 60 // 5분 설정
 const sessionObj = {
     secret: "wegf6124@#$@#!",  // 암호화를 할 때 필요한 요소값 쿠키 변조 방지
     resave: false, // 변경사항 없어도 항상 저장할건지
