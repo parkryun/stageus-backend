@@ -57,7 +57,7 @@
         form.append('postTitleValue', postTitleValue)
         form.append('postContentValue', postContentValue)
 
-        const response = await fetch("/post/write", {
+        const response = await fetch("/post", {
             method: "POST",             
             body: form
         })

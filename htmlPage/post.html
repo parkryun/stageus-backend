@@ -28,87 +28,16 @@
 
 </body>
 <script>
-    let postNum = ''
-
-    const getPostNum = () => {
-        fetch("/postPage-postNum", {
-            method: "GET", 
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }) 
-        .then((response) => response.json())
-        .then((result) => {
-            postNum = result
-            fetch("/post", {
-                method: "POST", 
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    postNum_value: postNum
-                })
-            }) 
-            getPostEvent()
-        })
-    }
-
-    const getPostNumDelete = () => {
-        fetch("/postPage-postNum", {
-            method: "GET", 
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }) 
-        .then((response) => response.json())
-        .then((result) => {
-            postNum = result
-            fetch("/post", {
-                method: "POST", 
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    postNum_value: postNum
-                })
-            }) 
-            deletePostEvent()
-            location.href = "/post-list"
-        })
-    }
-
-    const getPostNumUpdate = () => {
-        fetch("/postPage-postNum", {
-            method: "GET", 
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }) 
-        .then((response) => response.json())
-        .then((result) => {
-            postNum = result
-            fetch("/post", {
-                method: "POST", 
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    postNum_value: postNum
-                })
-            }) 
-            postUpdateEvent()
-        })
-    }
+    const queryString = window.location.search
+    const urlParams = new URLSearchParams(queryString)
+    const postNum = urlParams.get("postNum")
 
     const getPostEvent = async () => {
-        const response = await fetch("/post", {
-            method: "POST", 
+        const response = await fetch(`/post/${postNum}`, {
+            method: "GET", 
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                postNum_value: postNum
-            })
         }) 
 
         const result = await response.json()
@@ -180,14 +109,11 @@
 
 
     const deletePostEvent = async () => {
-        const response = await fetch("/post", {
+        const response = await fetch(`/post/${postNum}`, {
             method: "DELETE", 
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                postNum_value: postNum
-            })
         })
     
         const result = await response.json()
@@ -201,13 +127,12 @@
     }
 
     const postUpdateEvent = async () => {
-        const response = await fetch("/post", {
+        const response = await fetch(`/post/${postNum}`, {
             method: "PUT", 
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                postNum_value: postNum,
                 post_content: document.getElementById("updateContent").value
             })
         })
@@ -231,6 +156,6 @@
         document.getElementById("updateBtn").style.visibility = 'visible'
     }
 
-    getPostNum()   
+    getPostEvent()
 </script>
 </html>

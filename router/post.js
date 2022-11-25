@@ -51,7 +51,7 @@ router.get("/list", async (req, res) => {
 })
 
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
-router.post("/", async (req, res) => {    
+router.get("/:postNum", async (req, res) => {    
     
     const result = {
         "success": false,
@@ -60,6 +60,7 @@ router.post("/", async (req, res) => {
         "commentList": []
     }
     const user = req.session.user.id
+    
     if (user == undefined) { // 세션 예외처리
         result.message = "세션없음"   
         res.send(result)
@@ -70,7 +71,9 @@ router.post("/", async (req, res) => {
     }
     
     const client = new Client(clientOption)
-    const postNum = req.body.postNum_value
+    
+    const postNum = req.params.postNum
+    console.log(postNum)
     request.postNum = postNum
 
 
@@ -104,7 +107,7 @@ router.post("/", async (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/write", upload.single('image'), async (req, res) => {        
+router.post("/", upload.single('image'), async (req, res) => {        
     
     // image location이랑 originalname 을 db에 저장하고 나중에 불러올 때 이거 가져와야지
     const result = {
@@ -199,7 +202,7 @@ router.put("/", async (req, res) => {
 
     const client = new Client(clientOption)
 
-    const postNum = req.body.postNum_value
+    const postNum = req.params.postNum
     const postContentValue = req.body.post_content    
     request.postNum = postNum
     request.content = postContentValue
@@ -235,7 +238,7 @@ router.put("/", async (req, res) => {
 })
 
 // 게시글 삭제api
-router.delete("/", async (req, res) => {    
+router.delete("/:postNum", async (req, res) => {    
 
     const result = {
         "success": false,
@@ -251,7 +254,7 @@ router.delete("/", async (req, res) => {
     }
 
     const client = new Client(clientOption)
-    const postNum = req.body.postNum_value
+    const postNum = req.params.postNum
     request.postNum = postNum
 
     if (postNum == undefined) { // undefined값 예외처리
