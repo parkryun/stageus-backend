@@ -2,24 +2,19 @@ const router = require("express").Router()
 const clientOption = require("../config/clientConfig/client")
 const { Client } = require("pg")  
 const requestIp = require("request-ip")
-const upload = require('../module/multer')
+const upload = require('../middleware/multer')
 const logging = require("../config/loggingConfig") // logging config
-
+const authCheck = require('../middleware/authCheck')
 
 // 게시글 리스트 api
-router.get("/list", async (req, res) => {  
+router.get("/list", authCheck, async (req, res) => {  
 
     const result = {
         "success": false,
         "message": "",
         "postList": []
     }
-    
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
+    const user = req.decoded.id // 쿠키에서 id값
 
     const request = {}
 
@@ -51,7 +46,7 @@ router.get("/list", async (req, res) => {
 })
 
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
-router.get("/:postNum", async (req, res) => {    
+router.get("/:postNum", authCheck, async (req, res) => {    
     
     const result = {
         "success": false,
@@ -59,16 +54,12 @@ router.get("/:postNum", async (req, res) => {
         "post": [],
         "commentList": []
     }
-    const user = req.session.user.id
-    
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
 
     const request = {
         "postNum": ""
     }
+
+    const user = req.decoded.id // 쿠키에서 id값
     
     const client = new Client(clientOption)
     
@@ -107,17 +98,12 @@ router.get("/:postNum", async (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/", upload.single('image'), async (req, res) => {        
+router.post("/", authCheck, upload.single('image'), async (req, res) => {        
     
     // image location이랑 originalname 을 db에 저장하고 나중에 불러올 때 이거 가져와야지
     const result = {
         "success": false,
         "message": "",
-    }
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
     }
 
     const request = {
@@ -125,6 +111,7 @@ router.post("/", upload.single('image'), async (req, res) => {
         "content": '',
         "id": ''
     }
+    const user = req.decoded.id // 쿠키에서 id값
 
     const client = new Client(clientOption)
     
@@ -194,12 +181,6 @@ router.put("/", async (req, res) => {
         "content": ""
     }
 
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
-
     const client = new Client(clientOption)
 
     const postNum = req.params.postNum
@@ -246,11 +227,6 @@ router.delete("/:postNum", async (req, res) => {
     }
     const request = {
         "postNum": "",
-    }
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
     }
 
     const client = new Client(clientOption)
