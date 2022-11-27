@@ -9,11 +9,6 @@ router.get("/list", async (req, res) => {
         "message": "",
         "loggingList": []
     }
-    if (req.session.user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
-    const user = req.session.user.id
 
     const client = await mongoClient.connect(mongoClientOption, {
         useNewUrlParser: true,
@@ -50,12 +45,6 @@ router.post("/list-filter", async (req, res) => {
         "message": "",
         "loggingList": []
     }
-    
-    if (req.session.user == undefined) { // 세션 예외처리 없으면 여기서 막히게
-        result.message = "세션없음"   
-        res.send(result)
-    }
-    const user = req.session.user.id
 
     const filterOptionValue = req.body.filter_option_value
     const filterContentValue = req.body.filter_content_value
@@ -112,12 +101,6 @@ router.post("/list-date-filter", async (req, res) => {
         "success": false,
         "message": "",
         "loggingList": []
-    }
-
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
     }
 
     const startDateValue = req.body.start_date_value

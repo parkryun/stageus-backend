@@ -1,6 +1,7 @@
 const router = require("express").Router() 
 const path = require("path")
 const clientOption = require("../config/clientConfig/client")
+const authCheck = require('../middleware/authCheck')
 
 const result = {
     "success": false,
@@ -11,68 +12,30 @@ const result = {
 let postNum = ""
 
 // get //mainPage
-router.get("/main", (req, res) => {
+router.get("/main", authCheck, (req, res) => {
     // res.sendFile(__dirname + "../htmlPage/mainPage.html")
     res.sendFile(path.join(__dirname, "../htmlPage/mainPage.html"))
 })
 
 // logging Page
-router.get("/loggingPage", (req, res) => {
-
-    const user = req.session.user.id
-
-    if (user == undefined) { // 세션 예외처리
-        
-        res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
-    }
+router.get("/loggingPage", authCheck, (req, res) => {
 
     res.sendFile(path.join(__dirname, "../htmlPage/logging.html"))
 })
-
-// get mainpage session
-router.get("/main-session", (req, res) => {
-    // res.sendFile(__dirname + "../htmlPage/mainPage.html")
-    let user = req.session.user
-    if (user) {
-        res.send(user)
-    } else {
-        result.message = "세션없음"
-        console.log(result)
-        res.send(result)
-    }
-})
-
+  
 // 로그인페이지 가져오기
 router.get("/login", (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
 })
 
 // 게시글 보는 페이지
-router.get("/postPage", (req, res) => {
-    postNum = req.query.postNum
-    // console.log(postNum)
+router.get("/postPage", authCheck, (req, res) => {
 
-    res.sendFile(path.join(__dirname, "../htmlPage/post.html"), postNum)
+    res.sendFile(path.join(__dirname, "../htmlPage/post.html"))
 })
-
-router.get("/postPage-postNum", (req, res) => {
-    res.send(postNum)
-})
-
-// 댓글 남길때 session
-router.get("/comment-session", (req, res) => {
-    let user = req.session.user
-    if (user) {
-        res.send(user)
-    } else {
-        result.message = "세션없음"
-        console.log(result)
-        res.send(result)
-    }
-})
-
+  
 // 게시글 작성 페이지
-router.get("/post-write", (req, res) => {
+router.get("/post-write", authCheck, (req, res) => {
     res.sendFile(path.join(__dirname, "../htmlPage/postWrite.html"))
 })
 
@@ -89,20 +52,8 @@ router.get("/post-write-session", (req, res) => {
 })
 
 // 게시판 목록 가져오기 ( 게시판 페이지 )
-router.get("/post-list", (req, res) => {         
+router.get("/post-list", authCheck, (req, res) => {         
     res.sendFile(path.join(__dirname, '../htmlPage/postList.html'))
-})
-
-// 게시글 목록 session
-router.get("/post-list-session", (req, res) => {
-    let user = req.session.user
-    if (user) {
-        res.send(user)
-    } else {
-        result.message = "세션없음"
-        console.log(result)
-        res.send(result)
-    }
 })
 
 // 아이디찾기 페이지

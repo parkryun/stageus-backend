@@ -3,7 +3,9 @@ const clientOption = require("../config/clientConfig/client")
 const { Client } = require("pg") 
 const requestIp = require("request-ip")
 const logging = require("../config/loggingConfig") // logging config
-
+const jwtToken = require("../config/jwt")
+const cookieOption = require('../config/cookieOption')
+const authCheck = require('../middleware/authCheck')
 // PostgreSQL 기본 설정 ( DB 계정 설정)
 
 
@@ -49,11 +51,17 @@ router.post("/login", async (req, res) => {
                     result.success = true // 로그인 성공
                     result.message = "로그인 성공"
 
-                    req.session.user = {
+                    const payload = {
                         id: row[0].id,
                         name: row[0].name,
                         email: row[0].email
                     }
+                    // jwt 생성
+                    const userToken = jwtToken(payload)
+                    // 쿠키 생성
+                    
+                    res.cookie('user', userToken, cookieOption)
+
                     //=============MongoDB 로깅
                     logging(requestIp.getClientIp(req), "", "account/login", "post", request, result)
 
@@ -74,21 +82,17 @@ router.post("/login", async (req, res) => {
 })
 
 // 로그아웃 api
-router.get("/logout", async (req, res) => {
+router.get("/logout", authCheck, async (req, res) => {
 
     const result = {
         "success": false,
         "message": "",
     }
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
+    const user = req.decoded.id // 쿠키에서 id값
+
+
     const request = {}
 
-
-    req.session.destroy()
     //=============================MongoDB
     try {
 
@@ -99,6 +103,7 @@ router.get("/logout", async (req, res) => {
         res.send(result)
     }
     result.success = true
+    res.clearCookie("user")
     res.send(result)
 })
 
