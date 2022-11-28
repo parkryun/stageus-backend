@@ -41,6 +41,12 @@
         }) 
 
         const result = await response.json()
+
+        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        } 
+
         const post = result.post[0]
         // const commentListArray = result.commentList
 
@@ -107,7 +113,6 @@
         // }
     }
 
-
     const deletePostEvent = async () => {
         const response = await fetch(`/post/${postNum}`, {
             method: "DELETE", 
@@ -118,6 +123,11 @@
     
         const result = await response.json()
 
+        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        } 
+        
         if (result.success) {
             alert(result.message)
         } else {
@@ -139,6 +149,11 @@
     
         const result = await response.json()
 
+        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        } 
+        
         if (result.success) {
             alert(result.message)
             location.href = "/post-list"

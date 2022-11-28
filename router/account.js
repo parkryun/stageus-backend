@@ -80,11 +80,16 @@ router.get("/logout", async (req, res) => {
         "success": false,
         "message": "",
     }
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
+
+    let user = ""
+    
+    if (req.session.user) { // 세션 예외처리
+        user = req.session.user.id
+    } else {
+        result.message = "세션이 없습니다."
+        return res.send(result)
     }
+    
     const request = {}
 
 

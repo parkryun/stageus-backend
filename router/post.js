@@ -5,6 +5,7 @@ const requestIp = require("request-ip")
 const upload = require('../module/multer')
 const logging = require("../config/loggingConfig") // logging config
 
+let user = ""
 
 // 게시글 리스트 api
 router.get("/list", async (req, res) => {  
@@ -14,11 +15,12 @@ router.get("/list", async (req, res) => {
         "message": "",
         "postList": []
     }
-    
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
+
+    if (req.session.user) { // 세션 예외처리
+        user = req.session.user.id
+    } else {
+        result.message = "세션이 없습니다."
+        return res.send(result)
     }
 
     const request = {}
@@ -45,7 +47,6 @@ router.get("/list", async (req, res) => {
         res.send(result)
     } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
         result.message = err.message
-        console.log(err.message)
         res.send(result)
     }
 })
@@ -59,11 +60,12 @@ router.get("/:postNum", async (req, res) => {
         "post": [],
         "commentList": []
     }
-    const user = req.session.user.id
-    
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
+
+    if (req.session.user) { // 세션 예외처리
+        user = req.session.user.id
+    } else {
+        result.message = "세션이 없습니다."
+        return res.send(result)
     }
 
     const request = {
@@ -109,16 +111,19 @@ router.get("/:postNum", async (req, res) => {
 // 게시글 작성 api
 router.post("/", upload.single('image'), async (req, res) => {        
     
-    // image location이랑 originalname 을 db에 저장하고 나중에 불러올 때 이거 가져와야지
     const result = {
         "success": false,
         "message": "",
     }
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
+
+    if (req.session.user) { // 세션 예외처리
+        user = req.session.user.id
+    } else {
+        result.message = "세션이 없습니다."
+        return res.send(result)
     }
+
+    // image location이랑 originalname 을 db에 저장하고 나중에 불러올 때 이거 가져와야지
 
     const request = {
         "title": '',
@@ -189,17 +194,19 @@ router.put("/", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    if (req.session.user) { // 세션 예외처리
+        user = req.session.user.id
+    } else {
+        result.message = "세션이 없습니다."
+        return res.send(result)
+    }
+ 
     const request = {
         "postNum": "",
         "content": ""
     }
-
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
-
+ 
     const client = new Client(clientOption)
 
     const postNum = req.params.postNum
@@ -244,15 +251,18 @@ router.delete("/:postNum", async (req, res) => {
         "success": false,
         "message": "",
     }
+
+    if (req.session.user) { // 세션 예외처리
+        user = req.session.user.id
+    } else {
+        result.message = "세션이 없습니다."
+        return res.send(result)
+    }
+ 
     const request = {
         "postNum": "",
     }
-    const user = req.session.user.id
-    if (user == undefined) { // 세션 예외처리
-        result.message = "세션없음"   
-        res.send(result)
-    }
-
+ 
     const client = new Client(clientOption)
     const postNum = req.params.postNum
     request.postNum = postNum

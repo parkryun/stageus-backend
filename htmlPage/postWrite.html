@@ -22,23 +22,20 @@
     </main>
 </body>
 <script>
-    let userId = ""
 
     const getsession = async () => {
-        const response = await fetch("/post-list-session", {
+        const response = await fetch("/post-write-session", {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json"
             }
         })
     
-        let user = await response.json()
+        let result = await response.json()
         
-        if(user.message == '세션없음') { // 세션값이 없을 때
+        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
-            location.href = "/login"
-        } else {
-            userId = user.id
+            return location.href = "/login"
         }
     }
 
@@ -64,6 +61,11 @@
     
         const result = await response.json()
         
+        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        }
+
         if (result.success) {
             alert(result.message)
             location.href = "/post-list"

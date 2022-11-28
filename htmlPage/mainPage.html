@@ -30,9 +30,9 @@
     
         let user = await response.json()
 
-        if(user.message == '세션없음') { // 세션값이 없을 때
+        if(user.message == '세션이 없습니다.') { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
-            location.href = "/login"
+            return location.href = "/login"
         } else {
             userId = user.id
             

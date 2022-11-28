@@ -12,107 +12,86 @@ let postNum = ""
 
 // get //mainPage
 router.get("/main", (req, res) => {
-    // res.sendFile(__dirname + "../htmlPage/mainPage.html")
+
     res.sendFile(path.join(__dirname, "../htmlPage/mainPage.html"))
+})
+
+// get mainpage session
+router.get("/main-session", (req, res) => {
+    
+    if (req.session.user) {
+        res.send(result)
+    } else {
+        result.message = "세션이 없습니다."
+        console.log(result)
+        res.send(result)
+    }
 })
 
 // logging Page
 router.get("/loggingPage", (req, res) => {
 
-    const user = req.session.user.id
-
-    if (user == undefined) { // 세션 예외처리
-        
-        res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
-    }
-
     res.sendFile(path.join(__dirname, "../htmlPage/logging.html"))
-})
-
-// get mainpage session
-router.get("/main-session", (req, res) => {
-    // res.sendFile(__dirname + "../htmlPage/mainPage.html")
-    let user = req.session.user
-    if (user) {
-        res.send(user)
-    } else {
-        result.message = "세션없음"
-        console.log(result)
-        res.send(result)
-    }
 })
 
 // 로그인페이지 가져오기
 router.get("/login", (req, res) => {
-    res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
+
+    if (req.session.user) { // 세션 예외처리
+        res.send("<script>alert('로그아웃이 필요합니다.');location.href = '/main'</script>")
+    } else {
+        res.sendFile(path.join(__dirname, "../htmlPage/login.html"))    
+    }
 })
 
 // 게시글 보는 페이지
 router.get("/postPage", (req, res) => {
+
     postNum = req.query.postNum
-    // console.log(postNum)
-
+    
     res.sendFile(path.join(__dirname, "../htmlPage/post.html"), postNum)
-})
-
-router.get("/postPage-postNum", (req, res) => {
-    res.send(postNum)
-})
-
-// 댓글 남길때 session
-router.get("/comment-session", (req, res) => {
-    let user = req.session.user
-    if (user) {
-        res.send(user)
-    } else {
-        result.message = "세션없음"
-        console.log(result)
-        res.send(result)
-    }
 })
 
 // 게시글 작성 페이지
 router.get("/post-write", (req, res) => {
+    
     res.sendFile(path.join(__dirname, "../htmlPage/postWrite.html"))
 })
 
 // 게시글 작성 session
 router.get("/post-write-session", (req, res) => {
-    let user = req.session.user
-    if (user) {
-        res.send(user)
+    
+    if (req.session.user) {
+        res.send(result)
     } else {
-        result.message = "세션없음"
-        console.log(result)
+        result.message = "세션이 없습니다."
         res.send(result)
     }
 })
 
 // 게시판 목록 가져오기 ( 게시판 페이지 )
-router.get("/post-list", (req, res) => {         
-    res.sendFile(path.join(__dirname, '../htmlPage/postList.html'))
-})
+router.get("/post-list", (req, res) => {    
 
-// 게시글 목록 session
-router.get("/post-list-session", (req, res) => {
-    let user = req.session.user
-    if (user) {
-        res.send(user)
-    } else {
-        result.message = "세션없음"
-        console.log(result)
-        res.send(result)
-    }
+    res.sendFile(path.join(__dirname, '../htmlPage/postList.html')) 
 })
-
+ 
 // 아이디찾기 페이지
 router.get("/find-id", (req, res) => {
-    res.sendFile(path.join(__dirname, "../htmlPage/findID.html"))
+
+    if (req.session.user) { // 세션 예외처리
+        res.send("<script>alert('로그아웃이 필요합니다.');location.href = '/main'</script>")
+    } else {
+        res.sendFile(path.join(__dirname, "../htmlPage/findID.html"))
+    }
 })
 
 // 비밀번호 찾기 페이지
 router.get("/find-pw", (req, res) => {
-    res.sendFile(path.join(__dirname, "../htmlPage/findPW.html"))
+    if (req.session.user) { // 세션 예외처리
+        res.send("<script>alert('로그아웃이 필요합니다.');location.href = '/main'</script>")
+    } else {
+        res.sendFile(path.join(__dirname, "../htmlPage/findPW.html"))
+    }
 })
 
 // 비밀번호 변경 페이지
