@@ -20,10 +20,9 @@ router.get("/main", (req, res) => {
 router.get("/main-session", (req, res) => {
     
     if (req.session.user) {
-        res.send(result)
+        res.send(req.session.user)
     } else {
         result.message = "세션이 없습니다."
-        console.log(result)
         res.send(result)
     }
 })

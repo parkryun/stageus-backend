@@ -1,7 +1,9 @@
 const express = require("express")  // 다른 js파일 연결 가능 require // 여기서는 설치된 express import
 const path = require("path")
 const session = require('express-session')
-const Memorystore = require('memorystore')(session)
+const mongoStore = require('connect-mongo') // session store을 mongodb로 
+const mongoClientOption = require('./config/clientConfig/mongoClient')
+// const Memorystore = require('memorystore')(session)
 const app = express() //express 문법 사용한다고 // import한걸 가져오는거
 // ==============라우터 
 const postApi = require("./router/post")
@@ -12,12 +14,22 @@ const loggingApi = require("./router/logging")
 
 const port = 3000
 
-const maxAge = 1000 * 60 * 60 // 5분 설정
+const maxAge = 24 * 60 * 60 // 하루
 const sessionObj = {
     secret: "wegf6124@#$@#!",  // 암호화를 할 때 필요한 요소값 쿠키 변조 방지
     resave: false, // 변경사항 없어도 항상 저장할건지
     saveUninitialized: true,    // 만들었을때 수정 안하면 uninitialized
-    store: new Memorystore({ checkPeriod: maxAge }),  // 서버를 저장할 공간 설정, checkPeriod > 서버쪽 세션의 유효기간
+    store: mongoStore.create({
+        mongoUrl: mongoClientOption,
+        dbName: 'stageus',
+        collectionName: 'sessions',
+        ttl: 1 * 60 * 60, // 세션 유효기간 1시간 
+        autoRemove: 'interval', // 주기적으로 제거 한다네 세션 만료된 친구들
+        autoRemoveInterval: 10, // 그 주기가 10분 
+        stringify: true
+    }),  
+        
+    // memorystore은 서버가 꺼지면 사라지는 휘발성
     cookie: {   // 쿠키 속성 값
         maxAge: maxAge     // 브라우저 쿠키의 유효기간
     }

@@ -54,6 +54,7 @@ router.post("/login", async (req, res) => {
                         name: row[0].name,
                         email: row[0].email
                     }
+                    console.log(req.session)
                     //=============MongoDB 로깅
                     logging(requestIp.getClientIp(req), "", "account/login", "post", request, result)
 
@@ -91,7 +92,6 @@ router.get("/logout", async (req, res) => {
     }
     
     const request = {}
-
 
     req.session.destroy()
     //=============================MongoDB
