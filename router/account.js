@@ -24,8 +24,8 @@ router.post("/login", async (req, res) => {
     }
 
     if (req.session.user) { // 세션이 있을 때
-        result.message = "세션이 없습니다."
-        return res.send(result)
+        return res.send("<script>alert('로그아웃이 필요합니다.');location.href = '/main'</script>")
+        
     }
 
     const client = new Client(clientOption)
@@ -83,7 +83,7 @@ router.post("/login", async (req, res) => {
                             email: row[0].email
                         }
                     } else {
-                        collection.remove({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`})
+                        collection.deleteOne({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`})
                         // 해당 세션 삭제
                         req.session.user = {
                             id: row[0].id,
@@ -134,9 +134,7 @@ router.get("/logout", async (req, res) => {
     }
     const request = {}
 
-    req.session.destroy(function() {
-        res.cookie('connect.sid','',{maxAge:0})
-    })
+    req.session.destroy()
     //=============================MongoDB
     try {
 

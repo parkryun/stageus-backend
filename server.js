@@ -37,6 +37,7 @@ const sessionObj = {
 app.use(session(sessionObj))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
+require("dotenv").config()
 
 app.use('/post', postApi)
 app.use('/find', findApi)

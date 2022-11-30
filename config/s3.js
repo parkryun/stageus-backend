@@ -1,6 +1,6 @@
 const s3Option = {
-    accessKeyId: "AKIASXWVBXEH5R2MAQM7",
-    secretAccessKey: "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",
+    accessKeyId: process.env.S3_ACCESS_KEY_ID,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY,
     region: "ap-northeast-2"
 }
 

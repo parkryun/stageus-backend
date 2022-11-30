@@ -75,7 +75,7 @@ router.get("/:postNum", async (req, res) => {
     const client = new Client(clientOption)
     
     const postNum = req.params.postNum
-    console.log(postNum)
+    
     request.postNum = postNum
 
 
@@ -139,8 +139,6 @@ router.post("/", upload.single('image'), async (req, res) => {
     let postImgUrl = ""
     
     request.id = idValue
-
-    console.log(req.file.mimetype.split('/')[1])
 
     if (req.file != undefined) { // 이미지 파일 없을 때 예외처리
     
