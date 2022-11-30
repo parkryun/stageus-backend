@@ -23,15 +23,14 @@ const sessionObj = {
         mongoUrl: mongoClientOption,
         dbName: 'stageus',
         collectionName: 'sessions',
-        ttl: 1 * 60 * 60, // 세션 유효기간 1시간 
+        ttl: 5 * 60, // 세션 유효기간 
         autoRemove: 'interval', // 주기적으로 제거 한다네 세션 만료된 친구들
         autoRemoveInterval: 10, // 그 주기가 10분 
-        stringify: true
     }),  
         
     // memorystore은 서버가 꺼지면 사라지는 휘발성
     cookie: {   // 쿠키 속성 값
-        maxAge: maxAge     // 브라우저 쿠키의 유효기간
+        // maxAge: maxAge     // 브라우저 쿠키의 유효기간
     }
 }
 

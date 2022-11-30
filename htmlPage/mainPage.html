@@ -53,10 +53,14 @@
         })
         const result = await response.json()
 
+        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        }
+
         if (result.success) {
             location.href = '/login'
         } else {
-            alert(result.message)
             console.log(result.message)
         }
     }

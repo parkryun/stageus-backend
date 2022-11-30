@@ -4,6 +4,10 @@ const { Client } = require("pg")
 const requestIp = require("request-ip")
 const logging = require("../config/loggingConfig") // logging config
 
+const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
+const mongoClient = require("mongodb").MongoClient
+// session mongodb 
+
 // PostgreSQL 기본 설정 ( DB 계정 설정)
 
 
@@ -17,6 +21,11 @@ router.post("/login", async (req, res) => {
     const request = {
         "id": "",
         "pw": ""
+    }
+
+    if (req.session.user) { // 세션이 있을 때
+        result.message = "세션이 없습니다."
+        return res.send(result)
     }
 
     const client = new Client(clientOption)
@@ -34,43 +43,76 @@ router.post("/login", async (req, res) => {
     if (idValue.length > 10 || pwValue.length > 10) {   // 길이 체크
         result.message = "정보를 다시 입력해주세요"
         return res.send(result)
-    } else {
-        try {
-            await client.connect() // await 붙여주는
-            
-            const sql = 'SELECT * FROM backend.account WHERE id=$1;'
-            const values = [idValue]
-    
-            const data = await client.query(sql, values)
-            const row = data.rows
-            
-            if (row.length > 0) {
-                if (pwValue == row[0].pw) { // 비밀번호 일치 예외처리
-                    result.success = true // 로그인 성공
-                    result.message = "로그인 성공"
+    }  
 
-                    req.session.user = {
-                        id: row[0].id,
-                        name: row[0].name,
-                        email: row[0].email
+    try {
+        await client.connect() // await 붙여주는
+        
+        const sql = 'SELECT * FROM backend.account WHERE id=$1;'
+        const values = [idValue]
+
+        const data = await client.query(sql, values)
+        const row = data.rows
+        
+        if (row.length > 0) {
+            if (pwValue == row[0].pw) { // 비밀번호 일치 예외처리
+                result.success = true // 로그인 성공
+                result.message = "로그인 성공"
+
+                const clientMongo = await mongoClient.connect(mongoClientOption, {
+                    useNewUrlParser: true,
+                    useUnifiedTopology: true
+                })
+            
+                try {
+                    const database = await clientMongo.db("stageus");
+                    const collection = await database.collection("sessions");
+            
+                    const data = collection.find({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`}) // 쿼리와 옵션 넣어줘
+            
+                    const sessionData = await data.toArray()
+            
+                    clientMongo.close()
+
+                    const sessionCheck = JSON.stringify(sessionData)
+                    
+                    if (sessionCheck == "[]") { // 세션 값이 비어있을 때 로그인이 안되어있을 때
+                        req.session.user = {
+                            id: row[0].id,
+                            name: row[0].name,
+                            email: row[0].email
+                        }
+                    } else {
+                        collection.remove({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`})
+                        // 해당 세션 삭제
+                        req.session.user = {
+                            id: row[0].id,
+                            name: row[0].name,
+                            email: row[0].email
+                        }
                     }
-                    console.log(req.session)
-                    //=============MongoDB 로깅
-                    logging(requestIp.getClientIp(req), "", "account/login", "post", request, result)
 
-                } else {
-                    result.message = '비밀번호가 일치하지 않습니다.'
+                } catch(err) {
+                    result.message = err.message
+                    console.log(err.message)
+                    return res.send(result)
                 }
+  
+                //=============MongoDB 로깅
+                logging(requestIp.getClientIp(req), "", "account/login", "post", request, result)
             } else {
-                result.message = '회원이 존재하지 않습니다.'
+                result.message = '비밀번호가 일치하지 않습니다.'
             }
-            res.send(result)   
-        } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
-            result.message = err.message
-            console.log(result.message)
-            res.send(result)
+        } else {
+            result.message = '회원이 존재하지 않습니다.'
         }
+        res.send(result)   
+    } catch(err) { // 아 어차피 캐로 다 들어가니까 그냥 쭉 쓰는거네 근데 에러부분 뜨는 방식을 잘 모르겠네
+        result.message = err.message
+        console.log(result.message)
+        res.send(result)
     }
+
 
 })
 
@@ -90,10 +132,11 @@ router.get("/logout", async (req, res) => {
         result.message = "세션이 없습니다."
         return res.send(result)
     }
-    
     const request = {}
 
-    req.session.destroy()
+    req.session.destroy(function() {
+        res.cookie('connect.sid','',{maxAge:0})
+    })
     //=============================MongoDB
     try {
 
