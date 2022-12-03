@@ -11,6 +11,8 @@ const findApi = require("./router/find")
 const pagesApi = require("./router/pages")
 const accountApi = require("./router/account")
 const loggingApi = require("./router/logging")
+require("dotenv").config()
+
 
 const port = 3000
 
@@ -30,6 +32,7 @@ const sessionObj = {
         
     // memorystore은 서버가 꺼지면 사라지는 휘발성
     cookie: {   // 쿠키 속성 값
+        httpOnly: true
         // maxAge: maxAge     // 브라우저 쿠키의 유효기간
     }
 }
@@ -37,7 +40,6 @@ const sessionObj = {
 app.use(session(sessionObj))
 app.use(express.urlencoded({extended: true}))
 app.use(express.json())
-require("dotenv").config()
 
 app.use('/post', postApi)
 app.use('/find', findApi)
