@@ -4,27 +4,19 @@ const { Client } = require("pg")
 const requestIp = require("request-ip")
 const upload = require('../module/multer')
 const logging = require("../config/loggingConfig") // logging config
-
-let user = ""
+const sessionCheck = require("../module/sessionCheck") // session check module
 
 // 게시글 리스트 api
-router.get("/list", async (req, res) => {  
+router.get("/list", sessionCheck, async (req, res) => {  
 
     const result = {
         "success": false,
         "message": "",
-        "postList": []
+        "postList": [],
     }
-
-    if (req.session.user) { // 세션 예외처리
-        user = req.session.user.id
-    } else {
-        result.message = "세션이 없습니다."
-        return res.send(result)
-    }
-
     const request = {}
-
+    const user = req.session.user.id
+  
     const client = new Client(clientOption)
 
     try {
@@ -52,22 +44,16 @@ router.get("/list", async (req, res) => {
 })
 
 // 해당 게시글 데이터 가져오는 api 댓글 가져오는 api도
-router.get("/:postNum", async (req, res) => {    
+router.get("/:postNum", sessionCheck, async (req, res) => {    
     
     const result = {
         "success": false,
         "message": "",
         "post": [],
-        "commentList": []
+        "commentList": [],
     }
-
-    if (req.session.user) { // 세션 예외처리
-        user = req.session.user.id
-    } else {
-        result.message = "세션이 없습니다."
-        return res.send(result)
-    }
-
+    const user = req.session.user.id
+  
     const request = {
         "postNum": ""
     }
@@ -109,20 +95,14 @@ router.get("/:postNum", async (req, res) => {
 })
 
 // 게시글 작성 api
-router.post("/", upload.single('image'), async (req, res) => {        
+router.post("/", sessionCheck, upload.single('image'), async (req, res) => {        
     
     const result = {
         "success": false,
         "message": "",
     }
-
-    if (req.session.user) { // 세션 예외처리
-        user = req.session.user.id
-    } else {
-        result.message = "세션이 없습니다."
-        return res.send(result)
-    }
-
+    const user = req.session.user.id
+  
     // image location이랑 originalname 을 db에 저장하고 나중에 불러올 때 이거 가져와야지
 
     const request = {
@@ -186,19 +166,13 @@ router.post("/", upload.single('image'), async (req, res) => {
 })
 
 // 게시글 수정api 
-router.put("/", async (req, res) => {
+router.put("/:postNum", sessionCheck, async (req, res) => {
 
     const result = {
         "success": false,
         "message": "",
     }
-
-    if (req.session.user) { // 세션 예외처리
-        user = req.session.user.id
-    } else {
-        result.message = "세션이 없습니다."
-        return res.send(result)
-    }
+    const user = req.session.user.id
  
     const request = {
         "postNum": "",
@@ -228,7 +202,8 @@ router.put("/", async (req, res) => {
             const values = [postContentValue, postNum]
     
             await client.query(sql, values)
-
+            
+            result.success = true
             result.message = "수정 완료"
 
             //=============================MongoDB
@@ -243,23 +218,16 @@ router.put("/", async (req, res) => {
 })
 
 // 게시글 삭제api
-router.delete("/:postNum", async (req, res) => {    
+router.delete("/:postNum", sessionCheck, async (req, res) => {    
 
     const result = {
         "success": false,
         "message": "",
     }
-
-    if (req.session.user) { // 세션 예외처리
-        user = req.session.user.id
-    } else {
-        result.message = "세션이 없습니다."
-        return res.send(result)
-    }
- 
     const request = {
         "postNum": "",
     }
+    const user = req.session.user.id
  
     const client = new Client(clientOption)
     const postNum = req.params.postNum
@@ -276,7 +244,8 @@ router.delete("/:postNum", async (req, res) => {
             const values = [postNum]
     
             await client.query(sql, values)
-            
+
+            result.success = true
             result.message = "삭제완료"
 
             //=============================MongoDB

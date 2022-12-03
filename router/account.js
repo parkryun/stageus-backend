@@ -3,6 +3,7 @@ const clientOption = require("../config/clientConfig/client")
 const { Client } = require("pg") 
 const requestIp = require("request-ip")
 const logging = require("../config/loggingConfig") // logging config
+const sessionCheck = require("../module/sessionCheck") // session check module
 
 const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
 const mongoClient = require("mongodb").MongoClient
@@ -21,11 +22,6 @@ router.post("/login", async (req, res) => {
     const request = {
         "id": "",
         "pw": ""
-    }
-
-    if (req.session.user) { // 세션이 있을 때
-        return res.send("<script>alert('로그아웃이 필요합니다.');location.href = '/main'</script>")
-        
     }
 
     const client = new Client(clientOption)
@@ -74,23 +70,17 @@ router.post("/login", async (req, res) => {
             
                     clientMongo.close()
 
-                    const sessionCheck = JSON.stringify(sessionData)
+                    const mongodbSessionCheck = JSON.stringify(sessionData)
                     
-                    if (sessionCheck == "[]") { // 세션 값이 비어있을 때 로그인이 안되어있을 때
-                        req.session.user = {
-                            id: row[0].id,
-                            name: row[0].name,
-                            email: row[0].email
-                        }
-                    } else {
+                    if (mongodbSessionCheck != "[]") { // 세션 값이 비어있을 때 로그인이 안되어있을 때
+                        
                         collection.deleteOne({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`})
-                        // 해당 세션 삭제
-                        req.session.user = {
-                            id: row[0].id,
-                            name: row[0].name,
-                            email: row[0].email
-                        }
-                    }
+                    }   // 해당 세션 삭제
+                    req.session.user = {
+                        id: row[0].id,
+                        name: row[0].name,
+                        email: row[0].email
+                    }    
 
                 } catch(err) {
                     result.message = err.message
@@ -117,22 +107,14 @@ router.post("/login", async (req, res) => {
 })
 
 // 로그아웃 api
-router.get("/logout", async (req, res) => {
+router.get("/logout", sessionCheck, async (req, res) => {
 
     const result = {
         "success": false,
         "message": "",
     }
-
-    let user = ""
-    
-    if (req.session.user) { // 세션 예외처리
-        user = req.session.user.id
-    } else {
-        result.message = "세션이 없습니다."
-        return res.send(result)
-    }
     const request = {}
+    let user = req.session.user.id    
 
     req.session.destroy()
     //=============================MongoDB
@@ -141,7 +123,7 @@ router.get("/logout", async (req, res) => {
         logging(requestIp.getClientIp(req), user, "account/logout", "get", request, result)
 
     } catch {
-        result.message = err
+        result.message = err.message
         res.send(result)
     }
     result.success = true

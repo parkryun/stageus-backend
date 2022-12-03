@@ -19,7 +19,7 @@
     </section>
 </body>
 <script>
-    let user = {}
+    let userId = ""
     const getsession = async () => {
         const response = await fetch("/main-session", {
             method: "GET", 
@@ -28,18 +28,17 @@
             }
         })
     
-        let user = await response.json()
+        let result = await response.json()
 
-        if(user.message == '세션이 없습니다.') { // 세션값이 없을 때
+        if(result.sessionCheck == false) { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
             return location.href = "/login"
         } else {
-            userId = user.id
-            
-            document.getElementById("p_id").innerHTML = `${user.name}님 안녕하세요!`
+            userId = result.session.user.id
+            document.getElementById("p_id").innerHTML = `${userId}님 안녕하세요!`
         }
 
-        if (user.id == "manager") {
+        if (userId == "manager") {
             document.getElementById("loggingPageHref").style.visibility = "visible"
         }
     }
@@ -53,8 +52,8 @@
         })
         const result = await response.json()
 
-        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
-            alert("로그인이 필요합니다.")
+        if(result.sessionCheck == false) { // 세션값이 없을 때
+            alert(result.sessionCheck)
             return location.href = "/login"
         }
 

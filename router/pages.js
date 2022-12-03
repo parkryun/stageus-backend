@@ -1,30 +1,25 @@
 const router = require("express").Router() 
 const path = require("path")
-const clientOption = require("../config/clientConfig/client")
+const sessionCheck = require("../module/sessionCheck") // session check module
 
 const result = {
     "success": false,
     "message": "",
-    "post": []
+    session: null
 }   
 
-let postNum = ""
 
 // get //mainPage
 router.get("/main", (req, res) => {
-
+    
     res.sendFile(path.join(__dirname, "../htmlPage/mainPage.html"))
 })
 
 // get mainpage session
-router.get("/main-session", (req, res) => {
-    
-    if (req.session.user) {
-        res.send(req.session.user)
-    } else {
-        result.message = "세션이 없습니다."
-        res.send(result)
-    }
+router.get("/main-session", sessionCheck, (req, res) => {
+
+    result.session = req.session
+    res.send(result)
 })
 
 // logging Page
@@ -36,8 +31,8 @@ router.get("/loggingPage", (req, res) => {
 // 로그인페이지 가져오기
 router.get("/login", (req, res) => {
 
-    if (req.session.user) { // 세션 예외처리
-        res.send("<script>alert('로그아웃이 필요합니다.');location.href = '/main'</script>")
+    if (req.session.user) { // 세션 예외처리 
+        res.sendFile(path.join(__dirname, "../htmlPage/mainPage.html")) // 이게 더 자연스럽지 
     } else {
         res.sendFile(path.join(__dirname, "../htmlPage/login.html"))    
     }
@@ -45,26 +40,17 @@ router.get("/login", (req, res) => {
 
 // 게시글 보는 페이지
 router.get("/postPage", (req, res) => {
-
-    postNum = req.query.postNum
     
-    res.sendFile(path.join(__dirname, "../htmlPage/post.html"), postNum)
+    res.sendFile(path.join(__dirname, "../htmlPage/post.html"))
 })
 
 // 게시글 작성 페이지
 router.get("/post-write", (req, res) => {
     
-    res.sendFile(path.join(__dirname, "../htmlPage/postWrite.html"))
-})
-
-// 게시글 작성 session
-router.get("/post-write-session", (req, res) => {
-    
     if (req.session.user) {
-        res.send(result)
+        res.sendFile(path.join(__dirname, "../htmlPage/postWrite.html"))
     } else {
-        result.message = "세션이 없습니다."
-        res.send(result)
+        res.sendFile(path.join(__dirname, "../htmlPage/login.html"))
     }
 })
 

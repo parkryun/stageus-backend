@@ -22,23 +22,7 @@
     </main>
 </body>
 <script>
-
-    const getsession = async () => {
-        const response = await fetch("/post-write-session", {
-            method: "GET", 
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-    
-        let result = await response.json()
-        
-        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
-            alert("로그인이 필요합니다.")
-            return location.href = "/login"
-        }
-    }
-
+ 
     const PostEvent = async () => {
 
         const inputImage = document.getElementById('post_write_input_file').files[0]
@@ -61,7 +45,7 @@
     
         const result = await response.json()
         
-        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+        if (result.sessionCheck == false) { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
             return location.href = "/login"
         }
@@ -74,8 +58,6 @@
             console.log(result.message)
         }
     }
-
-    getsession()    
 
 </script>
 </html>

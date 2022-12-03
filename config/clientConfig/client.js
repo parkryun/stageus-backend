@@ -1,8 +1,8 @@
 const clientOption = {
-    user: process.env.PG_CLIENT_USER,
-    password: process.env.PG_CLIENT_PASSWORD,
-    host: process.env.PG_CLIENT_HOST,
-    database: process.env.PG_CLIENT_DATABASE,
+    user: "ubuntu",
+    password: "1234",
+    host: "localhost",
+    database: "stageus",
     port: 5432
 }
 

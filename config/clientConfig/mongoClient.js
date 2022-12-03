@@ -1,3 +1,3 @@
-const mongoClientOption = process.env.MONGO_CLIENT_OPTION
+const mongoClientOption = "mongodb://localhost:27017"
 
 module.exports = mongoClientOption

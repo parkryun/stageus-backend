@@ -13,9 +13,9 @@
             
         </section>
 
-        <input type="button" id="post_remove_btn" value="게시글 삭제" onclick="getPostNumDelete()">
+        <input type="button" id="post_remove_btn" value="게시글 삭제" onclick="deletePostEvent()">
 
-        <input type="button" id="post_update_btn" value="게시글 수정" onclick="showUpdateTextarea()">
+        <input type="button" id="post_update_btn" value="게시글 수정" onclick="postUpdateEvent()">
 
         <section id="comment_list_container">
 
@@ -42,7 +42,7 @@
 
         const result = await response.json()
 
-        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+        if (result.sessionCheck == false) { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
             return location.href = "/login"
         } 
@@ -123,16 +123,16 @@
     
         const result = await response.json()
 
-        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+        if (result.sessionCheck == false) { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
             return location.href = "/login"
         } 
         
         if (result.success) {
             alert(result.message)
+            return location.replace("/post-list") // 뒤로가기 안되게
         } else {
             alert(result.message)
-            console.log(result.message)
         }
     }
 
@@ -149,14 +149,14 @@
     
         const result = await response.json()
 
-        if(result.message == '세션이 없습니다.') { // 세션값이 없을 때
+        if (result.sessionCheck == false) { // 세션값이 없을 때
             alert("로그인이 필요합니다.")
             return location.href = "/login"
         } 
         
         if (result.success) {
             alert(result.message)
-            location.href = "/post-list"
+            return location.replace("/post-list")
         } else {
             console.log(result.message)
         }
