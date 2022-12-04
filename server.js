@@ -3,6 +3,9 @@ const path = require("path")
 const session = require('express-session')
 const mongoStore = require('connect-mongo') // session store을 mongodb로 
 const mongoClientOption = require('./config/clientConfig/mongoClient')
+const redisClient = require("redis").createClient()
+const redisStore = require("connect-redis")(session)
+
 // const Memorystore = require('memorystore')(session)
 const app = express() //express 문법 사용한다고 // import한걸 가져오는거
 // ==============라우터 
@@ -21,15 +24,10 @@ const sessionObj = {
     secret: "wegf6124@#$@#!",  // 암호화를 할 때 필요한 요소값 쿠키 변조 방지
     resave: false, // 변경사항 없어도 항상 저장할건지
     saveUninitialized: true,    // 만들었을때 수정 안하면 uninitialized
-    store: mongoStore.create({
-        mongoUrl: mongoClientOption,
-        dbName: 'stageus',
-        collectionName: 'sessions',
-        ttl: 5 * 60, // 세션 유효기간 
-        autoRemove: 'interval', // 주기적으로 제거 한다네 세션 만료된 친구들
-        autoRemoveInterval: 10, // 그 주기가 10분 
+    store: redisStore.create({
+        client: redisClient,
+        ttl: 5 * 60 // 세션 유효기간 
     }),  
-        
     // memorystore은 서버가 꺼지면 사라지는 휘발성
     cookie: {   // 쿠키 속성 값
         httpOnly: true
