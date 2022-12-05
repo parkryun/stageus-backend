@@ -3,7 +3,7 @@ const path = require("path")
 const session = require('express-session')
 const mongoStore = require('connect-mongo') // session store을 mongodb로 
 const mongoClientOption = require('./config/clientConfig/mongoClient')
-const redisClient = require("redis").createClient()
+const redisClient = require("redis").createClient({legacyMode: true}) // connect-redis 호환
 const redisStore = require("connect-redis")(session)
 
 // const Memorystore = require('memorystore')(session)
@@ -17,6 +17,11 @@ const loggingApi = require("./router/logging")
 require("dotenv").config()
 
 
+const redisClientConnect = async () => {
+    await redisClient.connect()
+}
+redisClientConnect()
+
 const port = 3000
 
 const maxAge = 24 * 60 * 60 // 하루
@@ -24,8 +29,9 @@ const sessionObj = {
     secret: "wegf6124@#$@#!",  // 암호화를 할 때 필요한 요소값 쿠키 변조 방지
     resave: false, // 변경사항 없어도 항상 저장할건지
     saveUninitialized: true,    // 만들었을때 수정 안하면 uninitialized
-    store: redisStore.create({
+    store: new redisStore({
         client: redisClient,
+        prefix : "session:",
         ttl: 5 * 60 // 세션 유효기간 
     }),  
     // memorystore은 서버가 꺼지면 사라지는 휘발성

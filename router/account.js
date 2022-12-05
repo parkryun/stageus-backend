@@ -5,6 +5,8 @@ const requestIp = require("request-ip")
 const logging = require("../config/loggingConfig") // logging config
 const sessionCheck = require("../module/sessionCheck") // session check module
 
+const redisClient = require("redis").createClient()
+
 const mongoClientOption = require("../config/clientConfig/mongoClient") //mongodbClient
 const mongoClient = require("mongodb").MongoClient
 // session mongodb 
@@ -55,39 +57,27 @@ router.post("/login", async (req, res) => {
                 result.success = true // 로그인 성공
                 result.message = "로그인 성공"
 
-                const clientMongo = await mongoClient.connect(mongoClientOption, {
-                    useNewUrlParser: true,
-                    useUnifiedTopology: true
-                })
-            
                 try {
-                    const database = await clientMongo.db("stageus");
-                    const collection = await database.collection("sessions");
-            
-                    const data = collection.find({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`}) // 쿼리와 옵션 넣어줘
-            
-                    const sessionData = await data.toArray()
-            
-                    clientMongo.close()
+                    await redisClient.connect()
+                    const data = await redisClient.get(`session:${req.session.id}`)
+                    const sessionData = JSON.parse(data)
 
-                    const mongodbSessionCheck = JSON.stringify(sessionData)
-                    
-                    if (mongodbSessionCheck != "[]") { // 세션 값이 비어있을 때 로그인이 안되어있을 때
-                        
-                        collection.deleteOne({session: `{"cookie":{"originalMaxAge":null,"expires":null,"httpOnly":true,"path":"/"},"user":{"id":"${row[0].id}","name":"${row[0].name}","email":"${row[0].email}"}}`})
-                    }   // 해당 세션 삭제
+                    if (sessionData != undefined || sessionData.user.id == req.session.user.id) { // 세션에 이미 값이 있으면 삭제
+                        redisClient.del(`session:${req.session.id}`)
+                    }
                     req.session.user = {
                         id: row[0].id,
                         name: row[0].name,
                         email: row[0].email
-                    }    
+                    }  
 
+                    await redisClient.disconnect()
                 } catch(err) {
                     result.message = err.message
                     console.log(err.message)
                     return res.send(result)
-                }
-  
+                } 
+
                 //=============MongoDB 로깅
                 logging(requestIp.getClientIp(req), "", "account/login", "post", request, result)
             } else {
