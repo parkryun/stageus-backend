@@ -16,6 +16,8 @@
     <section id="post_list_location_container">
         <a href="/post-list">게시물 보기</a>
         <a href="/loggingPage" id="loggingPageHref" style="visibility: hidden;">로깅 보기</a>
+        <div id="today_visit_counter"></div>
+        <div id="login_counter"></div>
     </section>
 </body>
 <script>
@@ -43,6 +45,31 @@
         }
     }
 
+    const getCounter = async () => {
+        const response = await fetch("/account/counter", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    
+        const result = await response.json()
+
+        if(result.sessionCheck == false) { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        }
+
+        if (result.success) {
+            
+            document.getElementById("today_visit_counter").innerHTML = `방문자 수 : ${result.visitCounter}`
+            document.getElementById("login_counter").innerHTML = `전체 로그인 수 : ${result.loginCounter}`
+        } else {
+            console.log(result.message)
+        }
+
+    }
+
     const logoutEvent = async () => {
         const response = await fetch("/account/logout", {
             method: "GET",
@@ -53,7 +80,7 @@
         const result = await response.json()
 
         if(result.sessionCheck == false) { // 세션값이 없을 때
-            alert(result.sessionCheck)
+            alert(result.message)
             return location.href = "/login"
         }
 
@@ -65,6 +92,7 @@
     }
 
     getsession()
+    getCounter()
 </script>
 
 </html>
