@@ -29,11 +29,6 @@ const sessionObj = {
     secret: "wegf6124@#$@#!",  // 암호화를 할 때 필요한 요소값 쿠키 변조 방지
     resave: false, // 변경사항 없어도 항상 저장할건지
     saveUninitialized: true,    // 만들었을때 수정 안하면 uninitialized
-    store: new redisStore({
-        client: redisClient,
-        prefix : "session:",
-        ttl: 5 * 60 // 세션 유효기간 
-    }),  
     // memorystore은 서버가 꺼지면 사라지는 휘발성
     cookie: {   // 쿠키 속성 값
         httpOnly: true

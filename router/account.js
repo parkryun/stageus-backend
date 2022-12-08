@@ -59,26 +59,29 @@ router.post("/login", async (req, res) => {
 
                 try {
                     // 세션 
-                    await redisClient.connect()
-                    const data = await redisClient.get(`session:${req.session.id}`)
-                    const sessionData = JSON.parse(data)
-
-                    if (data) {
-                        if (sessionData.user != undefined && sessionData.user == req.session.user) { // 세션에 이미 값이 있으면 삭제
-                            redisClient.del(`session:${req.session.id}`)
-                        }
-                    }
-                    
                     req.session.user = {
                         id: row[0].id,
                         name: row[0].name,
                         email: row[0].email
                     }  
+
+                    await redisClient.connect()
+
+                    const data = await redisClient.hGet("session", req.session.user.id)
+
+                    if (data) {
+                        if (data != req.session.id) { // data가 있는데 다르면 다른곳에서 로그인 한거겠지?
+                            redisClient.hDel("session", req.session.user.id)
+                        }
+                    }
+                
                     // ======== 로그인 회원 수 
                     await redisClient.sAdd("visit", req.session.user.id)
                     await redisClient.expireAt("visit", parseInt(todayEnd / 1000));  // 자정 만료
                     // 로그인 할 때마다 되는데 여기 아니면 할 곳이 없는데
 
+                    await redisClient.hSet("session", req.session.user.id, req.session.id)
+                    // await redisClient.expire("session", 5 * 60);  // 자정 만료
                     // ======== 전체 로그인 수 
                     const loginCounter = await redisClient.get("loginCounter")
 

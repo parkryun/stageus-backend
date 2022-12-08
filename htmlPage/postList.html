@@ -17,11 +17,16 @@
         </section>
 
         <section>
+            <input type="text" placeholder="제목을 입력하세요" id="search_post_input" onmouseover="showSearchListEvent()" onmouseout="removeSearchListEvent()">
+            <input type="button" value="검색" id="search_post_btn" onclick="getSearchPostEvent()">
             <input type="button" value="게시글 작성" id="write_post_btn" onclick="window.location.href='/post-write'">
         </section>
+        <div id="search_history_list_container"></div>
     </main>
 </body>
 <script>
+
+    let searchList = []
 
     const getPostListEvent = async () => {
         const response = await fetch("/post/list", {
@@ -39,6 +44,9 @@
         } 
 
         const postListArray = result.postList[0]
+        const searchListArray = result.searchList[0]
+
+        searchList.push(searchListArray)
 
         if (postListArray.length == 0) {
             console.log("포스트가 없습니다.")
@@ -73,7 +81,126 @@
         }
     }
 
+    const getSearchPostEvent = async () => {
+
+        const searchContent = document.getElementById("search_post_input").value
+
+        if (searchContent == "" || searchContent == null) {
+            alert("입력해주세요")
+        } else { 
+
+            const response = await fetch("/post/search", {
+                method: "POST", 
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    search_content: searchContent
+                })
+            })
+
+            const result = await response.json()
+
+            if (result.sessionCheck == false) { // 세션값이 없을 때
+                alert("로그인이 필요합니다.")
+                return location.href = "/login"
+            } 
+
+            const post = result.post[0]
+
+            const postListTable = document.getElementById("post_list_table")
+            postListTable.remove()
+
+            if (post.length == 0) {
+                console.log("포스트가 없습니다.")
+            } else {
+
+                let postTable = document.createElement('table') // logging Tr 
+                postTable.id = "post_list_table"
+                document.getElementById("board_list_container").appendChild(postTable)
+
+
+                let postTr = document.createElement('tr') // 포스트 Tr 
+                let postNumTd = document.createElement('td') // 포스트 넘버 td
+                let postTitleTd = document.createElement('td') // 제목 td
+                let postNameTd = document.createElement('td') // 이름 td
+                let postDateTd = document.createElement('td') // 날짜 td
+
+                postTr.appendChild(postNumTd)
+                postTr.appendChild(postTitleTd)
+                postTr.appendChild(postNameTd)
+                postTr.appendChild(postDateTd)
+                
+                document.getElementById("post_list_table").appendChild(postTr)
+
+                postNumTd.innerHTML = post[0].postnum
+                postTitleTd.innerHTML = post[0].posttitle
+                postNameTd.innerHTML = post[0].userid    // 나중에 유저네임으로 가져와
+                postDateTd.innerHTML = post[0].postdate
+
+
+                postTitleTd.addEventListener("click", function async()  {
+                    console.log(postNumTd.innerHTML)
+
+                    location.href = `/postPage?postNum=${postNumTd.innerHTML}`
+                })
+            }
+        }
+    }
+
+    const showSearchListEvent = () => {
+        console.log(searchList[0].length)
+
+
+
+        if (searchList[0] != undefined) {
+
+            let searchHistoryTable = document.createElement('table')
+
+            searchHistoryTable.id = "search_history_list"
+            
+            let searchHistoryTr1 = document.createElement('tr')
+            let searchHistoryTr2 = document.createElement('tr')
+            let searchHistoryTr3 = document.createElement('tr')
+            let searchHistoryTr4 = document.createElement('tr')
+            let searchHistoryTr5 = document.createElement('tr')
+
+
+            searchHistoryTable.appendChild(searchHistoryTr1)
+            searchHistoryTable.appendChild(searchHistoryTr2)
+            searchHistoryTable.appendChild(searchHistoryTr3)
+            searchHistoryTable.appendChild(searchHistoryTr4)
+            searchHistoryTable.appendChild(searchHistoryTr5)
+
+            document.getElementById("search_history_list_container").appendChild(searchHistoryTable)
+
+            searchHistoryTr1.innerHTML = searchList[0][0]
+            searchHistoryTr2.innerHTML = searchList[0][1]
+            searchHistoryTr3.innerHTML = searchList[0][2]
+            searchHistoryTr4.innerHTML = searchList[0][3]
+            searchHistoryTr5.innerHTML = searchList[0][4]
+            
+        } else {
+            let searchHistoryDiv = document.createElement('div')
+            searchHistoryDiv.id = "search_history_div"
+            document.getElementById("search_history_list_container").appendChild(searchHistoryDiv)
+
+            searchHistoryDiv.innerHTML = "검색 기록이 없습니다."
+        }
+    }
+
+    const removeSearchListEvent = () => {
+        const searchHistoryTable = document.getElementById("search_history_list")
+        if (searchHistoryTable) {
+            searchHistoryTable.remove()
+        } else {
+            const searchHistoryDiv = document.getElementById("search_history_div")
+            searchHistoryDiv.remove()
+        }
+        
+    }
+
     getPostListEvent()
 
-    </script>
+</script>
 </html>

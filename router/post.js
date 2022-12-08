@@ -6,6 +6,10 @@ const upload = require('../module/multer')
 const logging = require("../config/loggingConfig") // logging config
 const sessionCheck = require("../module/sessionCheck") // session check module
 
+const redisClient = require("redis").createClient()
+
+let todayEnd = new Date(new Date().setHours(23, 59, 59, 999))
+
 // 게시글 리스트 api
 router.get("/list", sessionCheck, async (req, res) => {  
 
@@ -13,6 +17,7 @@ router.get("/list", sessionCheck, async (req, res) => {
         "success": false,
         "message": "",
         "postList": [],
+        "searchList": []
     }
     const request = {}
     const user = req.session.user.id
@@ -29,6 +34,14 @@ router.get("/list", sessionCheck, async (req, res) => {
 
         if (row.length > 0) {
             result.postList.push(row)
+            
+            //============get search list 
+            await redisClient.connect()
+            
+            const searchList = await redisClient.zRange(`searchList${req.session.user.id}`, 0, 4) 
+
+            result.searchList.push(searchList)
+            await redisClient.disconnect()
 
             //=============================MongoDB
             logging(requestIp.getClientIp(req), user, "post/list", "get", request, result)
@@ -257,6 +270,53 @@ router.delete("/:postNum", sessionCheck, async (req, res) => {
             res.send(result)
         }
     }
+})
+
+router.post("/search", sessionCheck, async (req, res) => {
+
+    const result = {
+        "success": false,
+        "message": "",
+        "post": []
+    }
+    const searchContent = req.body.search_content
+
+    const client = new Client(clientOption)
+
+    try {
+        await client.connect() 
+        
+        const sql = 'SELECT * FROM backend.post WHERE postTitle=$1;'
+ 
+        const values = [searchContent]
+
+        const data = await client.query(sql, values) // 게시글 가져오기
+
+        const row = data.rows
+
+        if (row.length > 0) {
+            result.post.push(row)
+        } else {
+            result.message = '해당 게시글이 존재하지 않습니다.'
+        }
+        // ======== 검색한 기록 redis에 저장
+        await redisClient.connect()
+        
+        const scoreTime = parseInt(1670000000 - (parseInt(Date.now() / 1000)))
+        
+        // 왜 그냥 score랑 value 자체로 넣으면 안되냐 object 값을 넣어야해서 그래?
+        await redisClient.zAdd(`searchList${req.session.user.id}`, {score: scoreTime, value: searchContent}) // 가장 앞쪽에 표시
+        // await redisClient.expireAt(`${searchList}-${req.session.user.id}`, parseInt(todayEnd / 1000));  // 자정 만료
+
+        await redisClient.disconnect()
+
+        res.send(result)
+    } catch(err) { 
+        result.message = err.message
+        console.log(result.message)
+        res.send(result)
+    }
+
 })
 
 // 댓글 작성
