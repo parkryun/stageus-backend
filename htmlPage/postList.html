@@ -149,36 +149,20 @@
     }
 
     const showSearchListEvent = () => {
-        console.log(searchList[0].length)
 
-
-
-        if (searchList[0] != undefined) {
+        if (searchList[0].length != 0) {
 
             let searchHistoryTable = document.createElement('table')
 
             searchHistoryTable.id = "search_history_list"
-            
-            let searchHistoryTr1 = document.createElement('tr')
-            let searchHistoryTr2 = document.createElement('tr')
-            let searchHistoryTr3 = document.createElement('tr')
-            let searchHistoryTr4 = document.createElement('tr')
-            let searchHistoryTr5 = document.createElement('tr')
+            for(var index = 0; index < searchList[0].length; index++) {
+                let searchHistoryTr = document.createElement('tr')
 
+                searchHistoryTable.appendChild(searchHistoryTr)
 
-            searchHistoryTable.appendChild(searchHistoryTr1)
-            searchHistoryTable.appendChild(searchHistoryTr2)
-            searchHistoryTable.appendChild(searchHistoryTr3)
-            searchHistoryTable.appendChild(searchHistoryTr4)
-            searchHistoryTable.appendChild(searchHistoryTr5)
-
-            document.getElementById("search_history_list_container").appendChild(searchHistoryTable)
-
-            searchHistoryTr1.innerHTML = searchList[0][0]
-            searchHistoryTr2.innerHTML = searchList[0][1]
-            searchHistoryTr3.innerHTML = searchList[0][2]
-            searchHistoryTr4.innerHTML = searchList[0][3]
-            searchHistoryTr5.innerHTML = searchList[0][4]
+                document.getElementById("search_history_list_container").appendChild(searchHistoryTable)
+                searchHistoryTr.innerHTML = searchList[0][index]
+            }
             
         } else {
             let searchHistoryDiv = document.createElement('div')
@@ -187,20 +171,61 @@
 
             searchHistoryDiv.innerHTML = "검색 기록이 없습니다."
         }
-    }
+    }    
 
     const removeSearchListEvent = () => {
         const searchHistoryTable = document.getElementById("search_history_list")
         if (searchHistoryTable) {
             searchHistoryTable.remove()
         } else {
-            const searchHistoryDiv = document.getElementById("search_history_div")
+            const searchHistoryDiv = document.getElementById("search_history_div") // 검색기록이 없습니다 문구
             searchHistoryDiv.remove()
         }
         
     }
 
     getPostListEvent()
+
+    // const test = () => {
+    //     console.log(searchList[0].length)
+
+
+
+    //     if (searchList[0] != undefined) {
+
+    //         let searchHistoryTable = document.createElement('table')
+
+    //         searchHistoryTable.id = "search_history_list"
+            
+    //         let searchHistoryTr1 = document.createElement('tr')
+    //         let searchHistoryTr2 = document.createElement('tr')
+    //         let searchHistoryTr3 = document.createElement('tr')
+    //         let searchHistoryTr4 = document.createElement('tr')
+    //         let searchHistoryTr5 = document.createElement('tr')
+
+
+    //         searchHistoryTable.appendChild(searchHistoryTr1)
+    //         searchHistoryTable.appendChild(searchHistoryTr2)
+    //         searchHistoryTable.appendChild(searchHistoryTr3)
+    //         searchHistoryTable.appendChild(searchHistoryTr4)
+    //         searchHistoryTable.appendChild(searchHistoryTr5)
+
+    //         document.getElementById("search_history_list_container").appendChild(searchHistoryTable)
+
+    //         searchHistoryTr1.innerHTML = searchList[0][0]
+    //         searchHistoryTr2.innerHTML = searchList[0][1]
+    //         searchHistoryTr3.innerHTML = searchList[0][2]
+    //         searchHistoryTr4.innerHTML = searchList[0][3]
+    //         searchHistoryTr5.innerHTML = searchList[0][4]
+            
+    //     } else {
+    //         let searchHistoryDiv = document.createElement('div')
+    //         searchHistoryDiv.id = "search_history_div"
+    //         document.getElementById("search_history_list_container").appendChild(searchHistoryDiv)
+
+    //         searchHistoryDiv.innerHTML = "검색 기록이 없습니다."
+    //     }
+    // }
 
 </script>
 </html>

@@ -58,30 +58,33 @@ router.post("/login", async (req, res) => {
                 result.message = "로그인 성공"
 
                 try {
-                    // 세션 
+                    await redisClient.connect()
+
+                    const data = await redisClient.hGet("session", row[0].id) // 해당 아이디 세션 collection 가져오고
+
+                    if (data) {
+                        if (data != req.session.id) { // data가 있는데 다르면 다른곳에서 로그인 한거겠지?
+                            redisClient.hDel("session", row[0].id) // 삭제
+                        }
+                    }
+                    
+                    // 세션 다시 만들고
                     req.session.user = {
                         id: row[0].id,
                         name: row[0].name,
                         email: row[0].email
                     }  
 
-                    await redisClient.connect()
-
-                    const data = await redisClient.hGet("session", req.session.user.id)
-
-                    if (data) {
-                        if (data != req.session.id) { // data가 있는데 다르면 다른곳에서 로그인 한거겠지?
-                            redisClient.hDel("session", req.session.user.id)
-                        }
-                    }
-                
                     // ======== 로그인 회원 수 
+                    // 이거 그냥 세션에 있는것들로 해도 되지 않을까 어차피 익스파이어 줄거면 세션에다 주는거지 근데 이러면 자정되면 다 끊기는거잖아
                     await redisClient.sAdd("visit", req.session.user.id)
                     await redisClient.expireAt("visit", parseInt(todayEnd / 1000));  // 자정 만료
                     // 로그인 할 때마다 되는데 여기 아니면 할 곳이 없는데
 
-                    await redisClient.hSet("session", req.session.user.id, req.session.id)
+                    // 세션 저장
+                    await redisClient.hSet("session", req.session.user.id, req.session.id) // 그냥 session.id값만 넣으면 되는거 아니야? 어차피 쿠키에 저장되어있자나 인증으로만 사용하는거니까
                     // await redisClient.expire("session", 5 * 60);  // 자정 만료
+
                     // ======== 전체 로그인 수 
                     const loginCounter = await redisClient.get("loginCounter")
 
