@@ -88,10 +88,12 @@ router.post("/login", async (req, res) => {
                     // ======== 전체 로그인 수 
                     const loginCounter = await redisClient.get("loginCounter")
 
-                    if (loginCounter) {
+                    if (loginCounter) { // 있으면 그냥 추가만 하는거고
                         await redisClient.set("loginCounter", parseInt(loginCounter) + 1)
-                    } else {
-                        await redisClient.set("loginCounter", 1)
+                    } else {    // 없으면 db에서 값을 가져와야지
+
+                        const counterData = await client.query("SELECT userCounter FROM backend.user") // 가져오고
+                        await redisClient.set("loginCounter", parseInt(counterData)) // redis에 넣어주고
                     }
 
                     await redisClient.disconnect()
