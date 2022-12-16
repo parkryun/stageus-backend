@@ -286,9 +286,9 @@ router.post("/search", sessionCheck, async (req, res) => {
     try {
         await client.connect() 
         
-        const sql = 'SELECT * FROM backend.post WHERE postTitle=$1;'
+        const sql = 'SELECT * FROM backend.post WHERE postTitle LIKE $1;'
  
-        const values = [searchContent]
+        const values = [`%${searchContent}%`]
 
         const data = await client.query(sql, values) // 게시글 가져오기
 

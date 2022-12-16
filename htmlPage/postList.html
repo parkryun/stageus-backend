@@ -73,8 +73,6 @@
 
 
                 postTitleTd.addEventListener("click", function async()  {
-                    console.log(postNumTd.innerHTML)
-
                     location.href = `/postPage?postNum=${postNumTd.innerHTML}`
                 })
             }
@@ -110,40 +108,39 @@
 
             const postListTable = document.getElementById("post_list_table")
             postListTable.remove()
-
+            
             if (post.length == 0) {
                 console.log("포스트가 없습니다.")
             } else {
 
                 let postTable = document.createElement('table') // logging Tr 
                 postTable.id = "post_list_table"
-                document.getElementById("board_list_container").appendChild(postTable)
 
+                for (var index = 0; index < post.length; index++) {
 
-                let postTr = document.createElement('tr') // 포스트 Tr 
-                let postNumTd = document.createElement('td') // 포스트 넘버 td
-                let postTitleTd = document.createElement('td') // 제목 td
-                let postNameTd = document.createElement('td') // 이름 td
-                let postDateTd = document.createElement('td') // 날짜 td
+                    let postTr = document.createElement('tr') // 포스트 Tr 
+                    let postNumTd = document.createElement('td') // 포스트 넘버 td
+                    let postTitleTd = document.createElement('td') // 제목 td
+                    let postNameTd = document.createElement('td') // 이름 td
+                    let postDateTd = document.createElement('td') // 날짜 td
 
-                postTr.appendChild(postNumTd)
-                postTr.appendChild(postTitleTd)
-                postTr.appendChild(postNameTd)
-                postTr.appendChild(postDateTd)
-                
-                document.getElementById("post_list_table").appendChild(postTr)
+                    postTr.appendChild(postNumTd)
+                    postTr.appendChild(postTitleTd)
+                    postTr.appendChild(postNameTd)
+                    postTr.appendChild(postDateTd)
 
-                postNumTd.innerHTML = post[0].postnum
-                postTitleTd.innerHTML = post[0].posttitle
-                postNameTd.innerHTML = post[0].userid    // 나중에 유저네임으로 가져와
-                postDateTd.innerHTML = post[0].postdate
+                    postNumTd.innerHTML = post[index].postnum
+                    postTitleTd.innerHTML = post[index].posttitle
+                    postNameTd.innerHTML = post[index].userid    // 나중에 유저네임으로 가져와
+                    postDateTd.innerHTML = post[index].postdate
 
+                    postTable.appendChild(postTr)
+                    document.getElementById("board_list_container").appendChild(postTable)
 
-                postTitleTd.addEventListener("click", function async()  {
-                    console.log(postNumTd.innerHTML)
-
+                    postTitleTd.addEventListener("click", function async()  {
                     location.href = `/postPage?postNum=${postNumTd.innerHTML}`
-                })
+                    })
+                }                                                
             }
         }
     }
