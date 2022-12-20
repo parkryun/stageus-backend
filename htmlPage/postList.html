@@ -21,7 +21,14 @@
             <input type="button" value="검색" id="search_post_btn" onclick="getSearchPostEvent()">
             <input type="button" value="게시글 작성" id="write_post_btn" onclick="window.location.href='/post-write'">
         </section>
+        
+        <section id="elastic_search_container">
+            <input type="text" placeholder="제목을 입력하세요" id="elastic_search_post_input" onmouseover="showSearchListEvent()" onmouseout="removeSearchListEvent()">
+            <input type="button" value="elastic search" id="elastic_search_post_btn" onclick="getElasticSearchEvent()">
+            
+        </section>
         <div id="search_history_list_container"></div>
+ 
     </main>
 </body>
 <script>
@@ -142,6 +149,19 @@
                     })
                 }                                                
             }
+        }
+    }
+
+    const getElasticSearchEvent = async () => {
+
+        const keyword = document.getElementById("elastic_search_post_input").value
+        const response = await fetch(`/post/elasticsearch?keyword=${keyword}`)
+        const result = await response.json()
+
+        if (result.success) {
+            console.log(result.data)
+        } else {
+            console.log(result.message)
         }
     }
 

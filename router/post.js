@@ -8,6 +8,9 @@ const sessionCheck = require("../module/sessionCheck") // session check module
 
 const redisClient = require("redis").createClient()
 
+const elastic = require("elasticsearch")
+
+
 let todayEnd = new Date(new Date().setHours(23, 59, 59, 999))
 
 // 게시글 리스트 api
@@ -155,8 +158,9 @@ router.post("/", sessionCheck, upload.single('image'), async (req, res) => {
     if (postTitleValue.length > 20 || postContentValue.length > 100) {   // 길이 체크
         result.message = "정보를 다시 입력해주세요"
         return res.send(result)
-    } else {
+    } else { 
         try {
+            // postgreSQL INSERT
             await client.connect()
             
             const sql = 'INSERT INTO backend.post (postTitle, postContent, userId, postImgUrl) VALUES ($1, $2, $3, $4);'
@@ -164,12 +168,24 @@ router.post("/", sessionCheck, upload.single('image'), async (req, res) => {
             
             await client.query(sql, values)
 
-            result.success = true
-            result.message = "작성 완료"
+            // elasticsearch INSERT
+            const connect = new elastic.Client({
+                "node": "http://localhost:9200/" // 노드 하나만 쓸꺼니까 노드 이름 적을 필요 없겠지?
+            })    
+            await connect.index({   // 데이터 넣어주는 함수 
+                "index": "board",
+                "body": {   // 여기부터가 document
+                    "author": idValue,       // 이거 하나하나가 field
+                    "title": postTitleValue,
+                    "content": postContentValue
+                }
+            })
 
             //=============================MongoDB
             logging(requestIp.getClientIp(req), user, "post/write", "post", request, result)
 
+            result.success = true
+            result.message = "작성 완료"
             res.send(result)
         } catch(err) { 
             result.message = err.message
@@ -317,6 +333,46 @@ router.post("/search", sessionCheck, async (req, res) => {
         res.send(result)
     }
 
+})
+
+router.get("/elasticsearch", sessionCheck, async (req, res) => {
+
+    const keyword = req.query.keyword
+
+    const result = {
+        "success": false,
+        "message": null,
+        "data": null
+    }
+
+    try {
+        const connect = new elastic.Client({
+            "node": "http://localhost:9200/" 
+        })  
+
+        const searchResult = await connect.search({
+            "index": "board",
+            "body": {
+                "size": 5,  // 검색 결과 5개
+                "sort": {   // 스코어 기준 내림차순
+                    "_score": "desc"
+                },
+                "query": {  // 이러이러한 조건으로 검색하겠다.
+                    "match": {
+                        "title": keyword,
+                        "author": keyword
+                    }
+                }
+            }
+        })
+
+        result.success = true
+        result.data = searchResult.hits.hits // 이걸 프론트로 보내주는거야 프론트에서 쓰는 값은 이거니까
+        res.send(result)
+    } catch (err) {
+        result.message = err.message
+        res.send(result)
+    }
 })
 
 // 댓글 작성
