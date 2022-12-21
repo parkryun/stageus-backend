@@ -338,26 +338,34 @@ router.post("/search", sessionCheck, async (req, res) => {
 router.get("/elasticsearch", sessionCheck, async (req, res) => {
 
     const keyword = req.query.keyword
-
+    console.log(keyword)
     const result = {
         "success": false,
         "message": null,
         "data": null
     }
-
+    console.log(122)
     try {
         const connect = new elastic.Client({
             "node": "http://localhost:9200/" 
         })  
-
+        console.log(1)
         const searchResult = await connect.search({
             "index": "board",
             "body": {
-                "size": 5,  // 검색 결과 5개
-                "sort": {   // 스코어 기준 내림차순
-                    "_score": "desc"
-                },
                 "query": {  // 이러이러한 조건으로 검색하겠다.
+                    "size": 5,  // 검색 결과 5개
+                    "sort": {   // 스코어 기준 내림차순
+                        "_score": "desc"
+                    },
+                    "tokenizer": "standard",    
+                    "filter": [ // 여기서 ngram해서 나눠주는거지
+                        {
+                            "type": "ngram",
+                            "min_gram": 2,
+                            "max_gram": 10
+                        }
+                    ],
                     "match": {
                         "title": keyword,
                         "author": keyword
@@ -365,7 +373,7 @@ router.get("/elasticsearch", sessionCheck, async (req, res) => {
                 }
             }
         })
-
+        console.log(searchResult)
         result.success = true
         result.data = searchResult.hits.hits // 이걸 프론트로 보내주는거야 프론트에서 쓰는 값은 이거니까
         res.send(result)
