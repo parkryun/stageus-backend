@@ -24,7 +24,7 @@
         
         <section id="elastic_search_container">
             <input type="text" placeholder="제목을 입력하세요" id="elastic_search_post_input" onmouseover="showSearchListEvent()" onmouseout="removeSearchListEvent()">
-            <input type="button" value="elastic search" id="elastic_search_post_btn" onclick="getElasticSearchEvent()">
+            <input type="button" value="elastic search" id="elastic_search_post_btn" onclick="test()">
             
         </section>
         <div id="search_history_list_container"></div>
@@ -154,17 +154,32 @@
 
     const getElasticSearchEvent = async () => {
 
-        const keyword = document.getElementById("elastic_search_post_input").value
-        const response = await fetch(`/post/elasticsearch?keyword=${keyword}`)
+        // const keyword = document.getElementById("elastic_search_post_input").value
+        const response = await fetch("/post/test", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
         const result = await response.json()
 
-        if (result.success) {
-            console.log(result.data)
-        } else {
-            console.log(result.message)
-        }
+        // if (result.success) {
+        //     console.log(result.data)
+        // } else {
+        //     console.log(result.message)
+        // }
     }
+        const test = async () => {
 
+        // const keyword = document.getElementById("elastic_search_post_input").value
+        const response = await fetch("/post/test", {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+    }
     const showSearchListEvent = () => {
 
         if (searchList[0].length != 0) {
