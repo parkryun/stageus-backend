@@ -24,7 +24,7 @@
         
         <section id="elastic_search_container">
             <input type="text" placeholder="제목을 입력하세요" id="elastic_search_post_input" onmouseover="showSearchListEvent()" onmouseout="removeSearchListEvent()">
-            <input type="button" value="elastic search" id="elastic_search_post_btn" onclick="test()">
+            <input type="button" value="elasticsearch" id="elastic_search_post_btn" onclick="getElasticSearchEvent()">
             
         </section>
         <div id="search_history_list_container"></div>
@@ -154,8 +154,14 @@
 
     const getElasticSearchEvent = async () => {
 
-        // const keyword = document.getElementById("elastic_search_post_input").value
-        const response = await fetch("/post/test", {
+        const keyword = document.getElementById("elastic_search_post_input").value
+
+        if (keyword == "" || keyword == null) {
+            alert("입력해주세요")
+            return;
+        }
+
+        const response = await fetch(`/post/elastic/search?keyword=${keyword}`, {
             method: "GET", 
             headers: {
                 "Content-Type": "application/json"
@@ -164,21 +170,54 @@
 
         const result = await response.json()
 
-        // if (result.success) {
-        //     console.log(result.data)
-        // } else {
-        //     console.log(result.message)
-        // }
-    }
-        const test = async () => {
+        if (result.sessionCheck == false) { // 세션값이 없을 때
+            alert("로그인이 필요합니다.")
+            return location.href = "/login"
+        }
 
-        // const keyword = document.getElementById("elastic_search_post_input").value
-        const response = await fetch("/post/test", {
-            method: "GET", 
-            headers: {
-                "Content-Type": "application/json"
+        if (result.success) {
+            const post = result.data
+
+            const postListTable = document.getElementById("post_list_table")
+            postListTable.remove()
+
+            if (post.length == 0) {
+                console.log("포스트가 없습니다.")
+            } else {
+                let postTable = document.createElement('table') // logging Tr 
+                postTable.id = "post_list_table"
+
+                for (var index = 0; index < post.length; index++) {
+
+                    let postTr = document.createElement('tr') // 포스트 Tr 
+                    let postTitleTd = document.createElement('td') // 제목 td
+                    let postNameTd = document.createElement('td') // 이름 td
+                    // let postNumTd = document.createElement('td') // 포스트 넘버 td
+                    // let postDateTd = document.createElement('td') // 날짜 td
+
+                    postTr.appendChild(postTitleTd)
+                    postTr.appendChild(postNameTd)
+                    // postTr.appendChild(postNumTd)
+                    // postTr.appendChild(postDateTd)
+
+                    postTitleTd.innerHTML = post[index]._source.title
+                    postNameTd.innerHTML = post[index]._source.author    // 나중에 유저네임으로 가져와
+                    // postNumTd.innerHTML = post[index].postnum
+                    // postDateTd.innerHTML = post[index].postdate
+
+                    postTable.appendChild(postTr)
+                    document.getElementById("board_list_container").appendChild(postTable)
+
+                    postTitleTd.addEventListener("click", function async()  {
+                    location.href = `/postPage?postNum=${postNumTd.innerHTML}`
+                    })
+                }
+                console.log(result.data[0]._source.author)
+                console.log(result.data[0])
             }
-        })
+        } else {
+            console.log(result.message)
+        }
     }
     const showSearchListEvent = () => {
 
@@ -217,47 +256,6 @@
     }
 
     getPostListEvent()
-
-    // const test = () => {
-    //     console.log(searchList[0].length)
-
-
-
-    //     if (searchList[0] != undefined) {
-
-    //         let searchHistoryTable = document.createElement('table')
-
-    //         searchHistoryTable.id = "search_history_list"
-            
-    //         let searchHistoryTr1 = document.createElement('tr')
-    //         let searchHistoryTr2 = document.createElement('tr')
-    //         let searchHistoryTr3 = document.createElement('tr')
-    //         let searchHistoryTr4 = document.createElement('tr')
-    //         let searchHistoryTr5 = document.createElement('tr')
-
-
-    //         searchHistoryTable.appendChild(searchHistoryTr1)
-    //         searchHistoryTable.appendChild(searchHistoryTr2)
-    //         searchHistoryTable.appendChild(searchHistoryTr3)
-    //         searchHistoryTable.appendChild(searchHistoryTr4)
-    //         searchHistoryTable.appendChild(searchHistoryTr5)
-
-    //         document.getElementById("search_history_list_container").appendChild(searchHistoryTable)
-
-    //         searchHistoryTr1.innerHTML = searchList[0][0]
-    //         searchHistoryTr2.innerHTML = searchList[0][1]
-    //         searchHistoryTr3.innerHTML = searchList[0][2]
-    //         searchHistoryTr4.innerHTML = searchList[0][3]
-    //         searchHistoryTr5.innerHTML = searchList[0][4]
-            
-    //     } else {
-    //         let searchHistoryDiv = document.createElement('div')
-    //         searchHistoryDiv.id = "search_history_div"
-    //         document.getElementById("search_history_list_container").appendChild(searchHistoryDiv)
-
-    //         searchHistoryDiv.innerHTML = "검색 기록이 없습니다."
-    //     }
-    // }
-
+  
 </script>
 </html>

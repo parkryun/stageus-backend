@@ -23,6 +23,7 @@ const sessionCheck = async (req, res, next) => {
 
     if (data == req.session.id) {
         result.sessionCheck = true
+        
         return next()
     } else {
         req.session.destroy()

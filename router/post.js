@@ -335,41 +335,44 @@ router.post("/search", sessionCheck, async (req, res) => {
 
 })
 
-router.get("/elasticsearch", sessionCheck, async (req, res) => {
+router.get("/elastic/search", sessionCheck, async (req, res) => {
 
     const keyword = req.query.keyword
-    console.log(keyword)
+
     const result = {
         "success": false,
         "message": null,
         "data": null
     }
-    console.log(122)
+    
     try {
         const connect = new elastic.Client({
             "node": "http://localhost:9200/" 
         })  
-        console.log(1)
+        
         const searchResult = await connect.search({
             "index": "board",
             "body": {
+                "size": 5,  // 검색 결과 5개
                 "query": {  // 이러이러한 조건으로 검색하겠다.
-                    "size": 5,  // 검색 결과 5개
-                    "sort": {   // 스코어 기준 내림차순
-                        "_score": "desc"
-                    },
-                    "tokenizer": "standard",    
-                    "filter": [ // 여기서 ngram해서 나눠주는거지
-                        {
-                            "type": "ngram",
-                            "min_gram": 2,
-                            "max_gram": 10
-                        }
-                    ],
-                    "match": {
-                        "title": keyword,
-                        "author": keyword
+                    
+                    // "tokenizer": "standard",    
+                    // "filter": [ // 여기서 ngram해서 나눠주는거지
+                    //     {
+                    //         "type": "ngram",
+                    //         "min_gram": 2,
+                    //         "max_gram": 10
+                    //     }
+                    // ],
+                    "bool": {
+                        "should": [ // 스코어값 올려주는 형식으로 가장 알맞는거 골라야하니까
+                            {"match": {"title": keyword}},
+                            {"match": {"author": keyword}}
+                        ]
                     }
+                },
+                "sort": {   // 스코어 기준 내림차순
+                    "_score": "desc"
                 }
             }
         })
@@ -379,6 +382,7 @@ router.get("/elasticsearch", sessionCheck, async (req, res) => {
         res.send(result)
     } catch (err) {
         result.message = err.message
+        console.log(result.message)
         res.send(result)
     }
 })
