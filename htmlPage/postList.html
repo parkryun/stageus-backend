@@ -25,15 +25,19 @@
         <section id="elastic_search_container">
             <input type="text" placeholder="제목을 입력하세요" id="elastic_search_post_input" onmouseover="showSearchListEvent()" onmouseout="removeSearchListEvent()">
             <input type="button" value="elasticsearch" id="elastic_search_post_btn" onclick="getElasticSearchEvent()">
-            
+            <input type="button" value="오늘" onclick="dateFilterEvent('today')">
+            <input type="button" value="어제" onclick="dateFilterEvent('yesterday')">
+            <input type="button" value="3일" onclick="dateFilterEvent('threeDay')">
         </section>
         <div id="search_history_list_container"></div>
  
+        
     </main>
 </body>
 <script>
 
     let searchList = []
+    let keyword = ""
 
     const getPostListEvent = async () => {
         const response = await fetch("/post/list", {
@@ -154,8 +158,8 @@
 
     const getElasticSearchEvent = async () => {
 
-        const keyword = document.getElementById("elastic_search_post_input").value
-
+        keyword = document.getElementById("elastic_search_post_input").value
+        
         if (keyword == "" || keyword == null) {
             alert("입력해주세요")
             return;
@@ -219,6 +223,7 @@
             console.log(result.message)
         }
     }
+
     const showSearchListEvent = () => {
 
         if (searchList[0].length != 0) {
@@ -255,7 +260,32 @@
         
     }
 
-    getPostListEvent()
-  
+    const dateFilterEvent = async (day) => {
+        
+        const response = await fetch(`/post/elastic/search/dateFilter?keyword=${keyword}&day=${day}`, {
+            method: "GET", 
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+
+        const result = await response.json()
+
+    }
+
+    // const dateFilterEvent = (day) => {  // 날짜 필터
+        
+    //     const response = await fetch(`/post/elastic/search?keyword=${keyword}&day=${day}`, {
+    //         method: "GET", 
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         }
+    //     })
+
+    //     const result = await response.json()
+
+    // }
+
+    getPostListEvent() 
 </script>
 </html>
