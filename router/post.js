@@ -3,6 +3,7 @@ const clientOption = require("../config/clientConfig/client")
 const { Client } = require("pg")  
 const requestIp = require("request-ip")
 const upload = require('../module/multer')
+const dateTime = require("../module/date") // date
 const logging = require("../config/loggingConfig") // logging config
 const sessionCheck = require("../module/sessionCheck") // session check module
 
@@ -171,13 +172,30 @@ router.post("/", sessionCheck, upload.single('image'), async (req, res) => {
             // elasticsearch INSERT
             const connect = new elastic.Client({
                 "node": "http://localhost:9200/" // 노드 하나만 쓸꺼니까 노드 이름 적을 필요 없겠지?
-            })    
+            })  
+ 
+            // await connect.indices.putMapping({
+            //     "index": "board",
+            //     "body": {
+            //         "mappings" : {
+            //             "timestamp": {
+            //                 "_default_":{
+            //                     "_timestamp" : {
+            //                         "enabled" : true,
+            //                         "store" : true
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // })
+
             await connect.index({   // 데이터 넣어주는 함수 
                 "index": "board",
                 "body": {   // 여기부터가 document
                     "author": idValue,       // 이거 하나하나가 field
                     "title": postTitleValue,
-                    "content": postContentValue
+                    "content": postContentValue,
                 }
             })
 
@@ -338,6 +356,16 @@ router.post("/search", sessionCheck, async (req, res) => {
 router.get("/elastic/search", sessionCheck, async (req, res) => {
 
     const keyword = req.query.keyword
+    const dateFilter = req.query.day
+
+    let dateValue = ""
+    if (dateFilter == 'today') {
+        dateValue = "now/d"
+    } else if (dateFilter == 'yesterday') {
+        dateValue = "now-1d/d"
+    } else if (dateFilter == 'threeDay') { 
+        dateValue = "now-3d/d"
+    }
 
     const result = {
         "success": false,
@@ -350,36 +378,60 @@ router.get("/elastic/search", sessionCheck, async (req, res) => {
             "node": "http://localhost:9200/" 
         })  
         
-        const searchResult = await connect.search({
-            "index": "board",
-            "body": {
-                "size": 5,  // 검색 결과 5개
-                "query": {  // 이러이러한 조건으로 검색하겠다.
-                    
-                    // "tokenizer": "standard",    
-                    // "filter": [ // 여기서 ngram해서 나눠주는거지
-                    //     {
-                    //         "type": "ngram",
-                    //         "min_gram": 2,
-                    //         "max_gram": 10
-                    //     }
-                    // ],
-                    "bool": {
-                        "should": [ // 스코어값 올려주는 형식으로 가장 알맞는거 골라야하니까
-                            {"match": {"title": keyword}},
-                            {"match": {"author": keyword}}
-                        ]
+        if (dateValue == "") {
+            const searchResult = await connect.search({
+                "index": "board",
+                "body": {
+                    "size": 5,  // 검색 결과 5개
+                    "query": {  // 이러이러한 조건으로 검색하겠다.
+                        "bool": {
+                            "should": [ // 스코어값 올려주는 형식으로 가장 알맞는거 골라야하니까
+                                {"match": {"title": keyword}},
+                                {"match": {"author": keyword}}
+                            ]
+                        }
+                    },
+                    "sort": {   // 스코어 기준 내림차순
+                        "_score": "desc"
                     }
-                },
-                "sort": {   // 스코어 기준 내림차순
-                    "_score": "desc"
                 }
-            }
-        })
-        console.log(searchResult)
-        result.success = true
-        result.data = searchResult.hits.hits // 이걸 프론트로 보내주는거야 프론트에서 쓰는 값은 이거니까
+            })
+            console.log(searchResult)
+            result.success = true
+            result.data = searchResult.hits.hits // 이걸 프론트로 보내주는거야 프론트에서 쓰는 값은 이거니까
+        } else {    // datevalue가 들어온거지
+            const searchResult = await connect.search({
+                "index": "board",
+                "body": {
+                    "size": 5,  // 검색 결과 5개
+                    "query": {  // 이러이러한 조건으로 검색하겠다.
+                        "bool": {
+                            "should": [ // 스코어값 올려주는 형식으로 가장 알맞는거 골라야하니까
+                                {"match": {"title": keyword}},
+                                {"match": {"author": keyword}}
+                            ]
+                        },
+                        "filter": {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": dateValue,
+                                    "lt": "now"     // 미만이니까
+                                }
+                            }
+                        }
+                    },
+                    "sort": {   // 스코어 기준 내림차순
+                        "_score": "desc"
+                    }
+                }
+            })
+
+            console.log(searchResult)
+            result.success = true
+            result.data = searchResult.hits.hits 
+        }
         res.send(result)
+
     } catch (err) {
         result.message = err.message
         console.log(result.message)
@@ -387,6 +439,21 @@ router.get("/elastic/search", sessionCheck, async (req, res) => {
     }
 })
 
+router.get("/elastic/search/dateFilter", sessionCheck, async (req, res) => {
+    
+    const keyword = req.query.keyword
+    const dateFilter = req.query.day
+
+    const result = {
+        "success": false,
+        "message": null,
+        "data": null
+    }
+    console.log(keyword)
+    console.log(dateFilter)
+
+    res.send(result)
+})
 // 댓글 작성
 router.post("/comment", async (req, res) => {
 
